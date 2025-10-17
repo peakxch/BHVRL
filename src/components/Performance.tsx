@@ -4,7 +4,7 @@ import { PerformanceNetwork } from "./PerformanceParticleSystem";
 
 export const Performance: React.FC = () => {
   return (
-    <section className="relative flex flex-col lg:flex-row items-center justify-between py-12 mb-20 bg-white overflow-hidden">
+    <section className="relative py-48  flex flex-col lg:flex-row items-center justify-between   bg-white overflow-hidden">
       {/* Left Side */}
       <div className="relative z-10 max-w-xl px-24 text-left">
         <h2 className="font-space-grotesk text-6xl font-bold text-black mb-12">

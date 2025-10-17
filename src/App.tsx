@@ -9,14 +9,25 @@ import { Contact } from './components/Contact';
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation />
-      <Hero />
-      <Process />
-      <Performance />
-      <Gallery />
-      <Contact />
+    <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
+    <Navigation />
+      <section className="snap-start">
+        <Hero />
+      </section>
+      <section className="snap-start">
+        <Process />
+      </section>
+      <section className="snap-start">
+        <Performance />
+      </section>
+      <section className="snap-start">
+        <Gallery />
+      </section>
+      <section className="snap-start">
+        <Contact />
+      </section>
     </div>
+    
   );
 }
 

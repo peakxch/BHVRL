@@ -127,6 +127,14 @@ export const Process: React.FC = () => {
           </p>
         </div>
       </div>
+      <div
+  onClick={() => {
+    document.getElementById("performance")?.scrollIntoView({ behavior: "smooth" });
+  }}
+  className="cursor-pointer mt-12 text-sm text-gray-500 text-center transition-opacity duration-500 hover:text-gray-700"
+>
+
+</div>
     </section>
   );
 };
