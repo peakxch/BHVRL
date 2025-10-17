@@ -18,9 +18,7 @@ export const Navigation: React.FC = () => {
             <a href="#services" className="text-gray-600 hover:text-black transition-colors duration-300">
               Services
             </a>
-            <a href="#process" className="text-gray-600 hover:text-black transition-colors duration-300">
-              Process
-            </a>
+  
 
             <a href="#gallery" className="text-gray-600 hover:text-black transition-colors duration-300">
               Work
@@ -46,10 +44,7 @@ export const Navigation: React.FC = () => {
               <a href="#services" className="text-gray-600 hover:text-black transition-colors duration-300">
                 Services
               </a>
-              <a href="#process" className="text-gray-600 hover:text-black transition-colors duration-300">
-                Process
-              </a>
-
+             
               <a href="#gallery" className="text-gray-600 hover:text-black transition-colors duration-300">
                 Work
               </a>

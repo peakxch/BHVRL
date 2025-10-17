@@ -8,12 +8,18 @@ interface Particle {
   vx: number;
   vy: number;
   id: number;
+  size: number;
+  alpha: number;
+  color: string;
 }
 
 interface ParticleSystemProps {
   word: string;
   className?: string;
 }
+
+const PARTICLE_SCALE = 2.0;
+const PRIMARY_COLOR = '#4DAAE9';
 
 export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className = '' }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,281 +28,258 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
   const morphingRef = useRef<boolean>(false);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Universal scale factor based on canvas size (base at 300px for smaller effect)
   const getScale = () => {
     const minDim = Math.min(dimensions.width, dimensions.height);
     return minDim > 0 ? minDim / 300 : 1;
   };
 
-  // Particle configurations for different words
   const getParticleConfig = (word: string) => {
     const configs = {
-      'Human': {
-        count: 40,
-        pattern: 'concentric_rings',
-        color: '#4192C5',
-        connectionDistance: 60,
-        speed: 0.15,
-        morphSpeed: 0.08,
-        particleRadius: 1.5,
-        lineWidth: 2,
-        pulse: false
-      },
-      'Product': {
-        count: 40,
-        pattern: 'hexagon',
-        color: '#4192C5',
-        connectionDistance: 50,
-        speed: 0.15,
-        morphSpeed: 0.08,
-        particleRadius: 1.5,
-        lineWidth: 2,
-        pulse: false
-      },
-      'Process': {
-        count: 40,
-        pattern: 'wave',
-        color: '#4192C5',
-        connectionDistance: 55,
-        speed: 0.15,
-        morphSpeed: 0.08,
-        particleRadius: 1.5,
-        lineWidth: 2,
-        pulse: false
-      },
-      'Usage': {
-        count: 40,
-        pattern: 'golden_spiral',
-        color: '#4192C5',
-        connectionDistance: 65,
-        speed: 0.15,
-        morphSpeed: 0.08,
-        particleRadius: 1.5,
-        lineWidth: 2,
-        pulse: false
-      },
-      'Transaction': {
-        count: 40,
-        pattern: 'constellation',
-        color: '#4192C5',
-        connectionDistance: 45,
-        speed: 0.15,
-        morphSpeed: 0.08,
-        particleRadius: 1.5,
-        lineWidth: 2,
-        pulse: false
-      }
-    };
-    
-    return configs[word as keyof typeof configs] || configs['Human'];
+      Human: { count: 40, pattern: 'concentric_rings' },
+      Product: { count: 40, pattern: 'cube_projection' },
+      Process: { count: 40, pattern: 'wave' },
+      Usage: { count: 40, pattern: 'golden_spiral' },
+      Transaction: { count: 40, pattern: 'constellation' },
+    } as const;
+    return (configs as any)[word] || configs.Human;
   };
 
-  // Initialize particles based on pattern
-  const getTargetPositions = (config: ReturnType<typeof getParticleConfig>) => {
-    const particles: Particle[] = [];
+  const getTargetPositions = (config: ReturnType<typeof getParticleConfig>, word: string) => {
+    const positions: { x: number; y: number }[] = [];
     const { width, height } = dimensions;
     const scale = getScale();
     const clusterCount = 5;
-    
-    if (width === 0 || height === 0) return particles;
+
+    if (width === 0 || height === 0) return positions;
+
+    const anchorX = word === 'Process' ? width / 2 : width * 0.7;
+    const anchorY = height / 2;
+
+    const humanMultiplier = word === 'Human' ? 1.3 : 1;
 
     for (let i = 0; i < config.count; i++) {
-      let x, y;
+      let x: number, y: number;
       const cluster = i % clusterCount;
-      
+
       switch (config.pattern) {
-        case 'concentric_rings':
-          // Concentric rings pattern: 3 rings centered at Transaction's location, 60% smaller
+        case 'concentric_rings': {
           const ringCount = 3;
           const ringIndex = Math.floor(i / (config.count / ringCount));
-          const angle = (i % (config.count / ringCount)) / (config.count / ringCount) * Math.PI * 2;
-          const ringRadius = (0.04 + ringIndex * 0.02) * Math.min(width, height) * scale; // Reduced from 0.1, 0.15, 0.2 to 0.04, 0.06, 0.08
-          x = width * 0.75 + Math.cos(angle) * ringRadius + (Math.random() - 0.5) * 4 * scale; // Reduced from ±10 to ±4
-          y = height * 0.4 + Math.sin(angle) * ringRadius + (Math.random() - 0.5) * 4 * scale;
+          const angle = ((i % (config.count / ringCount)) / (config.count / ringCount)) * Math.PI * 2;
+          const ringRadius = (0.04 + ringIndex * 0.02) * Math.min(width, height) * scale * humanMultiplier;
+          x = anchorX + Math.cos(angle) * ringRadius;
+          y = anchorY + Math.sin(angle) * ringRadius;
           break;
-          
-        case 'hexagon':
+        }
+        case 'cube_projection': {
+          const cubeSize = 3; // number of points per edge (controls density)
+          const spacing = 40 * scale; // spacing between points
+          const offset = (cubeSize - 1) * spacing * 0.5;
+        
+          // stronger projection factors for real cube illusion
+          const depthFactorX = 0.7;
+          const depthFactorY = 0.45;
+        
+          // create layered 3D cube projected into 2D space
+          for (let xi = 0; xi < cubeSize; xi++) {
+            for (let yi = 0; yi < cubeSize; yi++) {
+              for (let zi = 0; zi < cubeSize; zi++) {
+                if (positions.length >= config.count) break;
+        
+                const x3d = xi * spacing - offset;
+                const y3d = yi * spacing - offset;
+                const z3d = zi * spacing - offset;
+        
+                // Apply isometric projection
+                const x2d = anchorX + (x3d - z3d * depthFactorX);
+                const y2d = anchorY + (y3d - z3d * depthFactorY);
+        
+                positions.push({ x: x2d, y: y2d });
+              }
+            }
+          }
+        
+          break;
+        }
+        
+        case 'hexagon': {
           const layer = Math.floor((Math.sqrt(12 * i + 9) - 3) / 6);
           const posInLayer = i - 3 * layer * (layer + 1);
           const hexAngle = (posInLayer / Math.max(1, 6 * layer)) * Math.PI * 2;
-          const hexRadius = layer * 20 * scale + 25 * scale;
-          x = width * 0.75 + Math.cos(hexAngle) * hexRadius + (Math.random() - 0.5) * 15 * scale;
-          y = height * 0.4 + Math.sin(hexAngle) * hexRadius + (Math.random() - 0.5) * 15 * scale;
+          const hexRadius = (layer * 20 * scale + 25 * scale) * humanMultiplier;
+          x = anchorX + Math.cos(hexAngle) * hexRadius;
+          y = anchorY + Math.sin(hexAngle) * hexRadius;
           break;
-          
-        case 'wave':
-          const waveX = (i / config.count) * width;
-          const wave1 = Math.sin((i / config.count) * Math.PI * 4) * 40 * scale;
-          const wave2 = Math.sin((i / config.count) * Math.PI * 8) * 20 * scale;
-          const wave3 = Math.sin((i / config.count) * Math.PI * 16) * 10 * scale;
-          x = waveX + (Math.random() - 0.5) * 30 * scale;
-          y = height / 2 + wave1 + wave2 + wave3 + (Math.random() - 0.5) * 30 * scale;
+        }
+        case 'wave': {
+          const minX = width * 0.45;
+          const maxX = width * 0.9;
+          const waveX = minX + ((i / config.count) * (maxX - minX));
+          const waveY = Math.sin((i / config.count) * Math.PI * 4) * 40 * scale;
+          const noiseX = (Math.random() - 0.5) * 60 * scale;
+          const noiseY = (Math.random() - 0.5) * 60 * scale;
+          x = waveX + noiseX;
+          y = anchorY + waveY + noiseY;
           break;
-          
-        case 'golden_spiral':
+        }
+        case 'golden_spiral': {
           const goldenAngle = i * 0.618 * Math.PI;
-          const goldenRadius = Math.pow(1.618, i * 0.1) * 12.5 * scale;
-          x = width * 0.75 + Math.cos(goldenAngle) * goldenRadius;
-          y = height * 0.4 + Math.sin(goldenAngle) * goldenRadius;
+          const goldenRadius = Math.pow(1.618, i * 0.1) * 12.5 * scale * humanMultiplier;
+          x = anchorX + Math.cos(goldenAngle) * goldenRadius;
+          y = anchorY + Math.sin(goldenAngle) * goldenRadius;
           break;
-          
-        case 'constellation':
+        }
+        case 'constellation': {
           const clusterAngleConst = (cluster / clusterCount) * Math.PI * 2;
-          const clusterRadiusConst = Math.min(width, height) * 0.125 * scale;
-          x = width * 0.75 + Math.cos(clusterAngleConst) * clusterRadiusConst;
-          y = height * 0.4 + Math.sin(clusterAngleConst) * clusterRadiusConst;
-          
+          const clusterRadiusConst = Math.min(width, height) * 0.125 * scale * humanMultiplier;
+          x = anchorX + Math.cos(clusterAngleConst) * clusterRadiusConst;
+          y = anchorY + Math.sin(clusterAngleConst) * clusterRadiusConst;
           const starAngle = Math.random() * Math.PI * 2;
           const starDistance = Math.random() * 40 * scale + 10 * scale;
           x += Math.cos(starAngle) * starDistance;
           y += Math.sin(starAngle) * starDistance;
           break;
-          
-        default:
+        }
+        default: {
           x = Math.random() * width;
           y = Math.random() * height;
-          break;
+        }
       }
-      
+
       x = Math.max(25 * scale, Math.min(width - 25 * scale, x));
       y = Math.max(25 * scale, Math.min(height - 25 * scale, y));
-      
-      particles.push({
-        x,
-        y,
-        targetX: x,
-        targetY: y,
-        vx: 0,
-        vy: 0,
-        id: i
-      });
+      positions.push({ x, y });
     }
-    
-    return particles;
+
+    return positions;
   };
 
-  // Initialize particles for the first time
-  const initializeParticles = (config: ReturnType<typeof getParticleConfig>) => {
-    const positions = getTargetPositions(config);
-    return positions.map(pos => ({
-      ...pos,
+  const initializeParticles = (word: string) => {
+    const config = getParticleConfig(word);
+    const targets = getTargetPositions(config, word);
+    return targets.map((pos, i) => ({
+      x: pos.x,
+      y: pos.y,
       targetX: pos.x,
-      targetY: pos.y
+      targetY: pos.y,
+      vx: 0,
+      vy: 0,
+      id: i,
+      size: 2 * PARTICLE_SCALE,
+      alpha: 1,
+      color: PRIMARY_COLOR,
     }));
   };
 
-  // Morph particles to new pattern
   const morphToPattern = (newWord: string) => {
     const config = getParticleConfig(newWord);
-    const newPositions = getTargetPositions(config);
-    
+    const newPositions = getTargetPositions(config, newWord);
+
     morphingRef.current = true;
-    
-    particlesRef.current.forEach((particle, index) => {
-      if (index < newPositions.length) {
-        particle.targetX = newPositions[index].targetX;
-        particle.targetY = newPositions[index].targetY;
+
+    particlesRef.current.forEach((p, idx) => {
+      const pos = newPositions[idx % newPositions.length];
+      if (pos) {
+        p.targetX = pos.x;
+        p.targetY = pos.y;
+        p.color = PRIMARY_COLOR;
+        p.size = 2 * PARTICLE_SCALE;
       }
     });
-    
+
     while (particlesRef.current.length < config.count) {
       const index = particlesRef.current.length;
-      const newPos = newPositions[index];
-      if (newPos) {
-        particlesRef.current.push({
-          x: Math.random() * dimensions.width,
-          y: Math.random() * dimensions.height,
-          targetX: newPos.targetX,
-          targetY: newPos.targetY,
-          vx: 0,
-          vy: 0,
-          id: index
-        });
-      }
+      const pos = newPositions[index % newPositions.length];
+      particlesRef.current.push({
+        x: Math.random() * dimensions.width,
+        y: Math.random() * dimensions.height,
+        targetX: pos?.x ?? Math.random() * dimensions.width,
+        targetY: pos?.y ?? Math.random() * dimensions.height,
+        vx: 0,
+        vy: 0,
+        id: index,
+        size: 2 * PARTICLE_SCALE,
+        alpha: 1,
+        color: PRIMARY_COLOR,
+      });
     }
-    
+
     if (particlesRef.current.length > config.count) {
       particlesRef.current = particlesRef.current.slice(0, config.count);
     }
   };
 
-  // Animation loop
   const animate = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    const config = getParticleConfig(word);
+
     const scale = getScale();
-    
+    if (!particlesRef.current.length) return;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    let allParticlesAtTarget = true;
-    
-    particlesRef.current.forEach(particle => {
-      if (morphingRef.current) {
-        const dx = particle.targetX - particle.x;
-        const dy = particle.targetY - particle.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance > 1 * scale) {
-          particle.x += dx * config.morphSpeed;
-          particle.y += dy * config.morphSpeed;
-          allParticlesAtTarget = false;
-        } else {
-          particle.x = particle.targetX;
-          particle.y = particle.targetY;
-        }
+
+    let allAtTarget = true;
+
+    for (const p of particlesRef.current) {
+      const dx = p.targetX - p.x;
+      const dy = p.targetY - p.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 0.5 * scale) {
+        const morphSpeed = 0.08;
+        p.x += dx * morphSpeed;
+        p.y += dy * morphSpeed;
+        allAtTarget = false;
+      } else {
+        p.x = p.targetX;
+        p.y = p.targetY;
       }
-      
-      particle.x = Math.max(0, Math.min(canvas.width, particle.x));
-      particle.y = Math.max(0, Math.min(canvas.height, particle.y));
-    });
-    
-    if (morphingRef.current && allParticlesAtTarget) {
-      morphingRef.current = false;
     }
-    
-    ctx.strokeStyle = config.color ;
-    ctx.lineWidth = config.lineWidth ;
-    
+
+    // Draw fewer solid connecting lines for a cleaner look
+    ctx.strokeStyle = PRIMARY_COLOR;
+    ctx.lineWidth = 0.4 * scale;
+    ctx.globalAlpha = 0.4;
     for (let i = 0; i < particlesRef.current.length; i++) {
       for (let j = i + 1; j < particlesRef.current.length; j++) {
-        const p1 = particlesRef.current[i];
-        const p2 = particlesRef.current[j];
-        const distance = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-        
-        if (distance < config.connectionDistance * scale) {
-          const opacity = 1 - (distance / (config.connectionDistance * scale));
-          ctx.strokeStyle = config.color + Math.floor(opacity * 200).toString(16).padStart(2, '0');
+        const a = particlesRef.current[i];
+        const b = particlesRef.current[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const dist = Math.hypot(dx, dy);
+        // reduce number of connections by lowering distance threshold
+        if (dist < 50 * scale) {
           ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
           ctx.stroke();
         }
       }
     }
-    
-    // Draw particles without pulsing
-    ctx.fillStyle = config.color;
-    particlesRef.current.forEach(particle => {
+    ctx.globalAlpha = 1;
+
+    // Draw particles
+    for (const p of particlesRef.current) {
+      ctx.fillStyle = p.color;
       ctx.beginPath();
-      const radius = config.particleRadius * scale;
-      ctx.arc(particle.x, particle.y, radius, 0, Math.PI * 2);
+      const radius = p.size * scale;
+      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
       ctx.fill();
-    });
-    
+    }
+
+    if (morphingRef.current && allAtTarget) {
+      morphingRef.current = false;
+    }
+
     animationRef.current = requestAnimationFrame(animate);
   };
 
-  // Handle resize
   useEffect(() => {
     const updateDimensions = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      
       const rect = canvas.getBoundingClientRect();
       setDimensions({ width: rect.width, height: rect.height });
       canvas.width = rect.width;
@@ -305,41 +288,26 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
-    
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
-  // Initialize particles when word or dimensions change
   useEffect(() => {
     if (dimensions.width > 0 && dimensions.height > 0) {
       if (particlesRef.current.length === 0) {
-        const config = getParticleConfig(word);
-        particlesRef.current = initializeParticles(config);
+        particlesRef.current = initializeParticles(word);
       } else {
         morphToPattern(word);
       }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      animate();
     }
   }, [word, dimensions]);
 
-  // Start animation
   useEffect(() => {
-    if (particlesRef.current.length > 0) {
-      animate();
-    }
-    
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [dimensions]);
-
-  // Handle word changes for morphing
-  useEffect(() => {
-    if (particlesRef.current.length > 0 && dimensions.width > 0) {
-      morphToPattern(word);
-    }
-  }, [word]);
+  }, []);
 
   return (
     <canvas

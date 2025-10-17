@@ -12,6 +12,18 @@ export default {
           600: '#3B96D6',
         },
       },
+      // ✨ Animated underline keyframes + animation
+      keyframes: {
+        underline: {
+          '0%': { width: '0%', left: '0%' },
+          '40%': { width: '100%', left: '0%' },
+          '60%': { width: '100%', left: '0%' },
+          '100%': { width: '0%', left: '100%' },
+        },
+      },
+      animation: {
+        underline: 'underline 3s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

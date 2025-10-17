@@ -1,223 +1,271 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-interface Particle {
+const metrics = ["Revenue", "Efficiency", "Engagement", "CX"];
+
+interface Point {
   x: number;
   y: number;
-  targetX: number;
-  targetY: number;
-  id: number;
+  vx: number;
+  vy: number;
 }
 
-interface PerformanceParticleSystemProps {
-  pattern: 'Search' | 'TrendingUp' | 'Scale';
-  className?: string;
-}
-
-export const PerformanceParticleSystem: React.FC<PerformanceParticleSystemProps> = ({ pattern, className = '' }) => {
+export const PerformanceNetwork: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
-  const particlesRef = useRef<Particle[]>([]);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [metricIndex, setMetricIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
-  // Particle configurations
-  const getParticleConfig = (pattern: string) => {
-    const configs = {
-      Search: {
-        count: 12,
-        pattern: 'magnifying_glass',
-        color: '#4DAAE9',
-        speed: 0.1,
-        particleRadius: 1,
-      },
-      TrendingUp: {
-        count: 12,
-        pattern: 'ascending_line',
-        color: '#4DAAE9',
-        speed: 0.1,
-        particleRadius: 1,
-      },
-      Scale: {
-        count: 12,
-        pattern: 'balance_scale',
-        color: '#4DAAE9',
-        speed: 0.1,
-        particleRadius: 1,
-      },
-    };
-    return configs[pattern as keyof typeof configs];
-  };
+  const numPoints = 120;
+  const trimRatio = 0.9;
+  const rightBufferRatio = 0.08;
+  const upliftStart = -10;
+  const upliftEnd = -120;
 
-  // Initialize particle positions based on pattern
-  const getTargetPositions = (config: ReturnType<typeof getParticleConfig>) => {
-    const particles: Particle[] = [];
-    const { width, height } = dimensions;
-    if (width === 0 || height === 0) return particles;
+  // 🔁 Smooth vertical metric transition (like Process.tsx)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setMetricIndex((prev) => (prev + 1) % (metrics.length + 1)); // +1 for seamless clone
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-    const scale = Math.min(width, height) / 32; // Base scale for 32px icons
-
-    for (let i = 0; i < config.count; i++) {
-      let x, y;
-
-      switch (config.pattern) {
-        case 'magnifying_glass':
-          if (i < config.count * 0.6) { // Circle for lens
-            const angle = (i / (config.count * 0.6)) * Math.PI * 2;
-            const radius = height * 0.35 * scale;
-            x = width / 2 + Math.cos(angle) * radius;
-            y = height / 2 + Math.sin(angle) * radius;
-          } else { // Diagonal handle
-            const progress = ((i - config.count * 0.6) / (config.count * 0.4));
-            x = width / 2 + 0.35 * width * scale + progress * 0.3 * width * scale;
-            y = height / 2 + 0.35 * height * scale + progress * 0.3 * height * scale;
-          }
-          x += (Math.random() - 0.5) * 2 * scale;
-          y += (Math.random() - 0.5) * 2 * scale;
-          break;
-
-        case 'ascending_line':
-          const progress = i / (config.count - 1);
-          x = progress * width;
-          y = height - (progress * height);
-          if (i % 3 === 0) y -= 3 * scale; // Small steps
-          x += (Math.random() - 0.5) * 2 * scale;
-          y += (Math.random() - 0.5) * 2 * scale;
-          break;
-
-        case 'balance_scale':
-          if (i < config.count * 0.3) { // Central beam
-            const angle = Math.PI + (i / (config.count * 0.3)) * Math.PI;
-            const radius = height * 0.2 * scale;
-            x = width / 2 + Math.cos(angle) * radius;
-            y = height / 2 + Math.sin(angle) * radius * 0.4;
-          } else if (i < config.count * 0.65) { // Left pan
-            const progress = ((i - config.count * 0.3) / (config.count * 0.35));
-            x = width * 0.3 + progress * 0.2 * width * scale;
-            y = height * 0.8;
-          } else { // Right pan
-            const progress = ((i - config.count * 0.65) / (config.count * 0.35));
-            x = width * 0.7 + progress * 0.2 * width * scale;
-            y = height * 0.8;
-          }
-          x += (Math.random() - 0.5) * 2 * scale;
-          y += (Math.random() - 0.5) * 2 * scale;
-          break;
-
-        default:
-          x = Math.random() * width;
-          y = Math.random() * height;
-          break;
-      }
-
-      x = Math.max(5 * scale, Math.min(width - 5 * scale, x));
-      y = Math.max(5 * scale, Math.min(height - 5 * scale, y));
-
-      particles.push({ x, y, targetX: x, targetY: y, id: i });
+  useEffect(() => {
+    if (metricIndex === metrics.length) {
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false);
+        setMetricIndex(0);
+      }, 700);
+      return () => clearTimeout(timeout);
     }
+  }, [metricIndex]);
 
-    return particles;
-  };
-
-  // Initialize particles
-  const initializeParticles = (config: ReturnType<typeof getParticleConfig>) => {
-    particlesRef.current = getTargetPositions(config);
-    console.log('Initialized particles:', particlesRef.current.length, pattern, dimensions);
-  };
-
-  // Animation loop
-  const animate = () => {
+  // 🎨 Particle network logic
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      console.log('Canvas not found');
-      return;
-    }
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.log('Context not found');
-      return;
-    }
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
 
-    const config = getParticleConfig(pattern);
-    const scale = Math.min(dimensions.width, dimensions.height) / 32;
+    const rightBuffer = width * rightBufferRatio;
+    const cGrey = 0.000002;
+    const stepSigma = height * 0.04;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const clamp = (v: number, min: number, max: number) =>
+      Math.max(min, Math.min(max, v));
 
-    particlesRef.current.forEach(particle => {
-      const dx = particle.targetX - particle.x;
-      const dy = particle.targetY - particle.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > 0.5 * scale) {
-        particle.x += dx * config.speed;
-        particle.y += dy * config.speed;
-      } else {
-        particle.x = particle.targetX;
-        particle.y = particle.targetY;
+    const generateCurve = (c: number) => {
+      const pts: { x: number; y: number }[] = [];
+      let accumulatedNoise = 0;
+      const usableWidth = width - rightBuffer;
+      const linearSlope = -(c * usableWidth * usableWidth) / 4;
+      for (let i = 0; i < numPoints; i++) {
+        const x = (i / (numPoints - 1)) * usableWidth;
+        const centeredX = x - usableWidth / 2;
+        let y = height * 0.6 + linearSlope * centeredX;
+        const t = i / (numPoints - 1);
+        const fade = Math.sin(t * Math.PI);
+        const localScale =
+          (1 + Math.sin(t * Math.PI * 4) * 2 + Math.sin(t * Math.PI * 8)) * fade;
+        accumulatedNoise += (Math.random() - 0.5) * stepSigma * localScale;
+        y = clamp(y + accumulatedNoise + height * 0.1, height * 0.1, height * 0.9);
+        pts.push({ x, y });
       }
+      return pts.slice(0, Math.floor(pts.length * trimRatio));
+    };
 
-      ctx.fillStyle = config.color;
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, config.particleRadius * scale, 0, Math.PI * 2);
-      ctx.fill();
+    const generateParticles = (curve: { x: number; y: number }[]): Point[] =>
+      curve.map((p) => ({
+        x: p.x + (Math.random() - 0.5) * 10,
+        y: p.y + (Math.random() - 0.5) * 10,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+      }));
+
+    const baseCurve = generateCurve(cGrey);
+    const upliftedCurve = baseCurve.map((p, i) => {
+      const t = i / (baseCurve.length - 1);
+      const uplift = upliftStart + (upliftEnd - upliftStart) * t;
+      return { x: p.x, y: clamp(p.y + uplift, height * 0.1, height * 0.85) };
     });
+    let greyParticles = generateParticles(baseCurve);
+    let greenParticles = generateParticles(upliftedCurve);
 
-    animationRef.current = requestAnimationFrame(animate);
-  };
+    let revealProgress = 0;
+    const revealSpeed = 0.008;
+    let frameId: number;
 
-  // Handle resize and initialization
-  useEffect(() => {
-    const updateDimensions = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+    const drawAxes = () => {
+      ctx.save();
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(2, 0);
+      ctx.lineTo(2, height - 30);
+      ctx.moveTo(0, height - 30);
+      ctx.lineTo(width - 80, height - 30);
+      ctx.stroke();
+      ctx.restore();
+    };
 
-      const parent = canvas.parentElement;
-      if (!parent) return;
+    // 🧩 Connect only 2–3 nearest neighbors
+    const drawConnections = (particles: Point[], color: string, maxDist: number) => {
+      const visibleCount = Math.floor(particles.length * revealProgress);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
 
-      const rect = parent.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) {
-        console.log('Parent has zero dimensions:', rect);
-        return;
+      for (let i = 0; i < visibleCount; i++) {
+        const p1 = particles[i];
+        const distances: { j: number; d: number }[] = [];
+
+        for (let j = 0; j < visibleCount; j++) {
+          if (i === j) continue;
+          const p2 = particles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < maxDist) distances.push({ j, d });
+        }
+
+        distances
+          .sort((a, b) => a.d - b.d)
+          .slice(0, 3)
+          .forEach(({ j }) => {
+            const p2 = particles[j];
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          });
       }
 
-      setDimensions({ width: rect.width, height: rect.height });
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-
-      const config = getParticleConfig(pattern);
-      initializeParticles(config);
+      ctx.globalAlpha = 1;
     };
 
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    const timeout = setTimeout(updateDimensions, 100); // Retry after layout
-
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-      clearTimeout(timeout);
-    };
-  }, [pattern]);
-
-  // Start animation
-  useEffect(() => {
-    if (particlesRef.current.length > 0 && dimensions.width > 0 && dimensions.height > 0) {
-      console.log('Starting animation:', pattern, particlesRef.current.length);
-      animate();
-    }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+    const drawParticles = (particles: Point[], color: string, r = 2) => {
+      const visibleCount = Math.floor(particles.length * revealProgress);
+      ctx.fillStyle = color;
+      for (let i = 0; i < visibleCount; i++) {
+        const p = particles[i];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+        ctx.fill();
       }
     };
-  }, [pattern, dimensions]);
+
+    const updateParticles = (particles: Point[], curve: { x: number; y: number }[]) => {
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const target = curve[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx += (target.x - p.x) * 0.002;
+        p.vy += (target.y - p.y) * 0.002;
+        p.vx += (Math.random() - 0.5) * 0.01;
+        p.vy += (Math.random() - 0.5) * 0.01;
+        p.x = clamp(p.x, 0, width);
+        p.y = clamp(p.y, height * 0.05, height * 0.95);
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, width, height);
+      drawAxes();
+      revealProgress = Math.min(revealProgress + revealSpeed, 1);
+
+      updateParticles(greyParticles, baseCurve);
+      updateParticles(greenParticles, upliftedCurve);
+
+      drawConnections(greyParticles, "rgba(150,150,150,0.5)", 60);
+      drawParticles(greyParticles, "rgba(150,150,150,0.7)");
+
+      drawConnections(greenParticles, "#4DAAE9", 65);
+      drawParticles(greenParticles, "#4DAAE9");
+
+      frameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    const handleResize = () => {
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [metricIndex]);
+
+  // 🧱 Setup for text animation
+  const lineHeight = 64; // increased for larger text
+  const metricBoxHeight = `${lineHeight}px`;
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`absolute inset-0 pointer-events-none ${className}`}
-      style={{ width: '100%', height: '100%' }}
-    />
+    <div className="relative w-full h-full">
+      {/* Canvas layer */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{ pointerEvents: "none" }}
+      />
+
+      {/* BHVRL impact on [Metric] */}
+      <div
+        className="absolute  left-8 flex items-center space-x-4 font-space-grotesk font-bold"
+        style={{ fontSize: "32px", lineHeight: metricBoxHeight }}
+      >
+        {/* BHVRL in blue */}
+        <span className="text-[#4DAAE9]">BHVRL</span>
+        {/* Impact on in black */}
+        <span className="text-black">Impact On</span>
+
+        {/* Metrics scroll container */}
+        <div
+          className="overflow-hidden"
+          style={{
+            height: metricBoxHeight,
+            width: "18rem",
+          }}
+        >
+          <div
+            className={`${
+              isTransitioning ? "transition-transform duration-700 ease-in-out" : ""
+            }`}
+            style={{
+              transform: `translateY(-${metricIndex * lineHeight}px)`,
+            }}
+          >
+            {metrics.map((metric, i) => (
+              <div
+                key={i}
+                className="text-[#000000]"
+                style={{
+                  height: metricBoxHeight,
+                  lineHeight: metricBoxHeight,
+                }}
+              >
+                {metric}
+              </div>
+            ))}
+            {/* Clone first for looping */}
+            <div
+              className="text-[#4DAAE9]"
+              style={{
+                height: metricBoxHeight,
+                lineHeight: metricBoxHeight,
+              }}
+            >
+              {metrics[0]}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };

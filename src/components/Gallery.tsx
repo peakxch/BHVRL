@@ -47,7 +47,7 @@ export const Gallery: React.FC = () => {
             Case Studies
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Real challenges, measurable outcomes. Here's how we've helped 
+            Real challenges, real impact. Here's how we've helped 
             organizations achieve transformational results.
           </p>
         </div>

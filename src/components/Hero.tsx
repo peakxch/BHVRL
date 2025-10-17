@@ -67,30 +67,30 @@ export const Hero: React.FC = () => {
   }, [charIndex, isDeleting, wordIndex, typingSpeed, words, isWaiting, showCursor, blinkCount]);
 
   return (
-    <section className="relative pt-16 pb-4 lg:pt-24 lg:pb-4 bg-white overflow-hidden">
+    <section className="relative pt-16  lg:pt-24  bg-white overflow-hidden">
       {/* Particle System Background */}
-      <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-00">
         <ParticleSystem word={particleWord} />
       </div>
       
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 mt-32">
         <div className="max-w-4xl">
           <h1 className="font-space-grotesk font-bold text-5xl lg:text-8xl leading-tight text-black mb-12">
             <div className="block">Decode</div>
             <div className="block">
-              <span className="inline-block min-w-[100px] lg:min-w-[150px]">
-                {currentWord}
-                {showCursor && (
-                  <span className="inline-block w-1.5 lg:w-2 h-12 lg:h-20 bg-black align-middle ml-1 -mt-2 lg:-mt-4" />
-                )}
-              </span>
+<span className="inline-block min-w-[100px] lg:min-w-[150px] text-[#4DAAE9]">
+  {currentWord}
+  {showCursor && (
+    <span className="inline-block w-1.5 lg:w-2 h-12 lg:h-20 bg-[#4DAAE9] align-middle ml-1 -mt-2 lg:-mt-4" />
+  )}
+</span>
             </div>
-            <div className="block">Behaviour</div>
+            <div className="block">Data</div>
           </h1>
 
           <p className="text-lg lg:text-xl text-black leading-relaxed mb-16 max-w-4xl font-normal">
-            BHVRL specializes in the quantification and distillation of data
-            through our behavioural engines to unlock strategic and tactical decision 
+            BHVRL specializes in the complex data analytics
+            to unlock strategic and tactical decision 
             making—driving revenue growth, optimizing costs and uncovering insights
           </p>
         </div>

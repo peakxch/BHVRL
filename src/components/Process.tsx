@@ -1,62 +1,130 @@
-import React from 'react';
-import { ParticleIcon } from './ParticleIcon';
+// Process.tsx
+import React, { useEffect, useState } from "react";
+import { FlowParticleSystem } from "./FlowParticleSystem";
+
+// Style for the large, elliptical, fuzzy blurb background
+const BLURB_STYLE: React.CSSProperties = {
+  position: "absolute",
+  left: "60%",
+  top: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "60vw",
+  height: "70vh",
+  borderRadius: "50% / 60%",
+  backgroundColor: "rgba(255, 255, 255, 0.85)", 
+  filter: "blur(20px)",
+  pointerEvents: "none",
+  zIndex: 1, // Below the particle canvas (zIndex: 2)
+};
+
+// Style for the focused text content box with a MORE fuzzy glow
+const TEXT_BOX_STYLE: React.CSSProperties = {
+  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  padding: '1rem 1rem', 
+  borderRadius: '1px', 
+  boxShadow: '0 0 60px 20px rgba(255, 255, 255, 0.7)', 
+  position: 'relative', 
+  maxWidth: '48rem', // Increased maxWidth to allow more space for "From Data to"
+  margin: '0 auto', // Center the narrower box
+};
+
 
 export const Process: React.FC = () => {
-  const steps = [
-    {
-      icon: <ParticleIcon type="target" color="#4192C5" size={100} />,
-      title: "Stage 1: Targeted Impact",
-      description: "Value-rich opportunities are identified, a behavioral system is outlined, and action levers with measurable KPIs are defined"
-    },
-    {
-      icon: <ParticleIcon type="settings" color="#4192C5" size={100} />,
-      title: "Stage 2: Develop & Deploy",
-      description: "Tailored behavioral engines are built, deployed, and seamlessly integrated into existing systems and processes"
-    },
-    {
-      icon: <ParticleIcon type="activity" color="#4192C5" size={100} />,
-      title: "Stage 3: Monitor & Optimize",
-      description: "Impact is measured, systems are refined where needed, and performance-based fees align directly with uplift achieved"
-    },
-    {
+  const words = ["Decision", "Action", "Insight"];
+  const [index, setIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
 
-      icon: <ParticleIcon type="refresh" color="#4192C5" size={100} />,
-      title: "Stage 4: Sustain & Evolve",
-      description: "Behavioral systems are continuously monitored, maintained, and adapted to ensure maximum impact"
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setIndex((prev) => (prev + 1) % (words.length + 1)); // +1 includes clone
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // After reaching the clone (last element), jump back instantly
+    if (index === words.length) {
+      const timeout = setTimeout(() => {
+        setIsTransitioning(false); // disable animation
+        setIndex(0); // reset
+      }, 700); // match duration
+      return () => clearTimeout(timeout);
     }
-  ];
+  }, [index, words.length]);
 
   return (
-    <section id="process" className="py-20 lg:py-10 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="text-center mb-16 lg:mb-12">
-          <h2 className="font-space-grotesk font-bold text-3xl lg:text-5xl text-black mb-6">
-            How We Work
-          </h2>
-        </div>
+    <section
+      id="process"
+      // CHANGED: Reverted to bg-white
+      className="relative py-32 lg:py-26 lg:pb-30 bg-white overflow-hidden" 
+    >
+      {/* 1. Large, Fuzzy Blurb Background (Z-index 1) */}
+      <div style={BLURB_STYLE} />
 
-        <div className="max-w-4xl mx-auto space-y-8">
-          {steps.map((step, index) => (
-            <div key={index} className="group">
-              <div className="bg-white border-b border-gray-200 pb-8 hover:border-[#4DAAE9] transition-colors duration-300">
-                <div className="flex items-start gap-8">
-                  <div className="flex-shrink-0">
-                    <div className="w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      {step.icon}
-                    </div>
+      {/* 2. Particle Canvas Background (Z-index 2) */}
+      <div 
+        className="absolute inset-0" 
+        // CHANGED: Removed opacity-60 to make particles fully visible
+        style={{ zIndex: 2 }} 
+      >
+        <FlowParticleSystem />
+      </div>
+
+      {/* 3. Text Content Container (Z-index 3) */}
+      <div className="relative max-w-5xl mx-auto px-6 lg:px-12 flex items-center justify-center min-h-[70vh]" style={{ zIndex: 3 }}> 
+        
+        {/* FUZZY CONTENT BOX WRAPPER */}
+        <div 
+            className="text-center" 
+            style={TEXT_BOX_STYLE}
+        >
+          {/* Text content moves inside the new box */}
+          <h2 className="font-space-grotesk font-bold text-4xl lg:text-6xl text-black mb-8 flex justify-center items-center">
+            <span style={{  minWidth: '26rem' }}>From Data To</span>
+
+            {/* Word container */}
+            <div
+              className="overflow-hidden inline-block align-bottom"
+              style={{
+                height: "1.2em",
+                width: "16rem", // Adjusted for inline fit
+                lineHeight: "1.2em",
+              }}
+            >
+              <div
+                className={`${
+                  isTransitioning
+                    ? "transition-transform duration-700 ease-in-out"
+                    : ""
+                }`}
+                style={{
+                  transform: `translateY(-${index * 1.2}em)`, // upward movement
+                }}
+              >
+                {words.map((word, i) => (
+                  <div
+                    key={i}
+                    className="text-[#4DAAE9] h-[1.2em] flex items-center justify-start"
+                  >
+                    {word}
                   </div>
-                  <div className="flex-1 pt-2">
-                    <h3 className="font-space-grotesk font-semibold text-xl lg:text-2xl text-black mb-4 group-hover:text-[#4DAAE9] transition-colors duration-300">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed font-normal">
-                      {step.description}
-                    </p>
-                  </div>
+                ))}
+                {/* Clone first word for seamless looping */}
+                <div className="text-[#4DAAE9] h-[1.2em] flex items-center justify-start">
+                  {words[0]}
                 </div>
               </div>
             </div>
-          ))}
+          </h2>
+
+          <p className="text-gray-700 text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed relative">
+            Fully managed advanced analytics — transforming your
+            data into clear outputs and actionable systems that drive <strong>revenue growth</strong>,{" "}
+            <strong>cost reduction</strong>,{" "}
+            <strong>operational efficiency &</strong> {" "}
+            <strong>deep insights</strong>.
+          </p>
         </div>
       </div>
     </section>
