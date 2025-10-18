@@ -19,14 +19,14 @@ export const Gallery: React.FC = () => {
       description: "Guided a SaaS startup's successful entry into European markets.",
       category: "Growth Strategy",
       industry: "South Africa",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom2.png"
     },
     {
       title: "Organizational Restructure",
       description: "Redesigned operations for a manufacturing company, reducing costs by 25%.",
       category: "Operations",
       industry: "South Africa",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom3.png"
     },
     {
       title: "Innovation Framework",
