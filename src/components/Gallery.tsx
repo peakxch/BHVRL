@@ -12,7 +12,7 @@ export const Gallery: React.FC = () => {
       description: "Helped a legacy retailer increase online revenue by 340% through digital strategy.",
       category: "South Africa",
       industry: "Telecommunications",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom.png"
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom1.png"
     },
     {
       title: "Market Expansion",
