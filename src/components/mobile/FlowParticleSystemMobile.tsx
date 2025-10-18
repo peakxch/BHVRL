@@ -1,5 +1,10 @@
 import React, { useEffect, useRef } from "react";
 
+interface Connection {
+  targetIndex: number;
+  thickness: number;
+}
+
 interface Particle {
   x: number;
   y: number;
@@ -13,27 +18,17 @@ interface Particle {
   targetY?: number;
   converged?: boolean;
   isFading?: boolean;
-  structureId?: number; // == bunch id for right particles
-}
-
-// Shared state for a emitted bunch (right side)
-interface BunchState {
-  id: number;
-  vx: number; // optional horizontal drift shared across bunch
-  vy: number; // **single speed for the whole bunch**
-  targetX: number;
-  targetY: number;
+  structureId?: number;
+  connections?: Connection[];
 }
 
 export const FlowParticleSystemMobile: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particles = useRef<Particle[]>([]);
+  const connections = useRef<[number, number][]>([]);
   const animationRef = useRef<number>();
   const currentStructureId = useRef(0);
   const lastEmitTimeRight = useRef(0);
-
-  // Track active right-side bunches and their shared velocities
-  const bunches = useRef<Map<number, BunchState>>(new Map());
 
   const PARTICLE_SCALE = 2.0;
 
@@ -45,11 +40,14 @@ export const FlowParticleSystemMobile: React.FC = () => {
   // --- Target and Start Logic (Flipped vertically) ---
 
   const getRandomTarget = (canvas: HTMLCanvasElement) => ({
+    // Slightly random horizontal spread, roughly center-left
     x: canvas.width * (0.35 + Math.random() * 0.3),
+    // ✅ Converge around 25% of screen height (top quarter)
     y: canvas.height * (0.35 + Math.random() * 0.05),
   });
 
   const getOffScreenStartPosition = (canvas: HTMLCanvasElement) => ({
+    // Start slightly above the top
     x: Math.random() * canvas.width,
     y: -Math.random() * 200 - 50,
   });
@@ -86,30 +84,23 @@ export const FlowParticleSystemMobile: React.FC = () => {
   // --- Right Particle Bunch Logic (Flipped vertically) ---
 
   const emitRightBunch = (canvas: HTMLCanvasElement) => {
-    const id = currentStructureId.current++;
-    const particlesPerBunch = Math.floor(Math.random() * 5) + 3; // 3–7
+    const groupID = currentStructureId.current++;
+    const particlesPerBunch = Math.floor(Math.random() * 5) + 3;
 
     const startY = canvas.height * 0.4;
     const targetY = canvas.height * 1.4 + Math.random() * 50 - 25;
     const targetX = canvas.width * 0.5 + Math.random() * 10;
     const horizontalRadius = 20 + Math.random() * 20;
     const verticalRadius = 20 + Math.random() * 30;
+    const avgVy = 10 + Math.random() * 3;
+    const maxJitter = 0.3;
 
-    // **Single shared speed for the bunch**
-    const sharedVy = 10 + Math.random() * 3; // starting speed
-    const sharedVx = (Math.random() - 0.5) * 0.2; // subtle shared drift
-
-    // Register bunch state
-    bunches.current.set(id, {
-      id,
-      vx: sharedVx,
-      vy: sharedVy,
-      targetX,
-      targetY,
-    });
+    const newParticles: Particle[] = [];
+    const startIndex = particles.current.length;
 
     for (let i = 0; i < particlesPerBunch; i++) {
       const angle = (i / particlesPerBunch) * Math.PI * 2;
+
       const particleColor = Math.random() < 0.3 ? GREY_COLOR : GOLD_COLOR;
 
       const p: Particle = {
@@ -118,16 +109,35 @@ export const FlowParticleSystemMobile: React.FC = () => {
         size: (Math.random() * 2.5 + 1.5) * PARTICLE_SCALE,
         alpha: 1,
         color: particleColor,
-        vx: sharedVx, // match bunch drift
-        vy: sharedVy, // match bunch speed
+        vx: (Math.random() - 0.5) * maxJitter,
+        vy: avgVy + (Math.random() - 0.5) * maxJitter, // flow downward
         type: "right",
-        structureId: id,
+        structureId: groupID,
         targetX,
         targetY,
         converged: false,
         isFading: false,
+        connections: [],
       };
+      newParticles.push(p);
       particles.current.push(p);
+    }
+
+    // Calculate connections between bunch particles
+    for (let i = 0; i < newParticles.length; i++) {
+      const p1 = newParticles[i];
+      const p1Index = startIndex + i;
+      for (let j = i + 1; j < newParticles.length; j++) {
+        if (Math.random() > 0.5) continue;
+        const p2 = newParticles[j];
+        const p2Index = startIndex + j;
+        const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        if (dist < 120) {
+          const thickness = 2;
+          p1.connections!.push({ targetIndex: p2Index, thickness });
+          p2.connections!.push({ targetIndex: p1Index, thickness });
+        }
+      }
     }
   };
 
@@ -147,7 +157,6 @@ export const FlowParticleSystemMobile: React.FC = () => {
 
     const initParticles = () => {
       particles.current = [];
-      bunches.current.clear();
       const numLeftParticles = 100;
 
       for (let k = 0; k < numLeftParticles; k++) {
@@ -169,6 +178,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
         };
         particles.current.push(p);
       }
+      connections.current = [];
     };
 
     const draw = () => {
@@ -181,145 +191,111 @@ export const FlowParticleSystemMobile: React.FC = () => {
         lastEmitTimeRight.current = now;
       }
 
-      // --- Update LEFT particles ---
+      const RANDOM_JITTER_FORCE = 0.05;
+
       for (let i = particles.current.length - 1; i >= 0; i--) {
         const p = particles.current[i];
-        if (p.type !== "left") continue;
 
-        const dx = (p.targetX! - p.x);
-        const dy = (p.targetY! - p.y);
-        const dist = Math.hypot(dx, dy);
+        if (p.type === "left") {
+          // --- Left flow vertically downward ---
+          const dx = p.targetX! - p.x;
+          const dy = p.targetY! - p.y;
+          const dist = Math.hypot(dx, dy);
 
-        if (!p.isFading && dist > 15) {
-          const force = 0.03;
-          p.vx += (dx / dist) * force;
-          p.vy += (dy / dist) * force;
-          p.converged = false;
-          p.vx *= 0.95;
-          p.vy *= 0.97;
-        } else if (dist <= 15 || p.isFading) {
-          p.converged = true;
-          p.isFading = true;
-          p.alpha -= 0.01;
-          if (p.alpha <= 0) resetLeftParticle(p, canvas);
-          p.vx *= 0.8;
-          p.vy *= 0.8;
-        }
-
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha = Math.max(0, Math.min(1, p.alpha));
-      }
-
-      // --- Update RIGHT particles in **bunches** so each bunch has the same speed ---
-      // 1) Compute a representative y for each bunch to drive braking/acceleration
-      const bunchRepresentativeY = new Map<number, number>();
-      for (const p of particles.current) {
-        if (p.type !== "right" || p.structureId == null) continue;
-        if (!bunchRepresentativeY.has(p.structureId)) bunchRepresentativeY.set(p.structureId, p.y);
-        else {
-          // keep the max y to make the braking based on the leading edge
-          const prev = bunchRepresentativeY.get(p.structureId)!;
-          if (p.y > prev) bunchRepresentativeY.set(p.structureId, p.y);
-        }
-      }
-
-      // 2) Update each bunch's shared velocity once
-      for (const [id, state] of bunches.current) {
-        const repY = bunchRepresentativeY.get(id);
-        if (repY == null) continue; // bunch might be empty
-
-        // Brake as we approach targetY, otherwise keep a steady descent
-        const toTarget = state.targetY - repY; // positive while above target
-        const brakeForce = 0.009;
-        if (toTarget > 0) {
-          state.vy += (brakeForce * toTarget) / 100; // accelerate early, gently
-          state.vy *= 0.97; // light damping to avoid runaway
-        } else {
-          state.vy *= 0.97; // keep damping once below target
-        }
-
-        // Cap speeds to avoid extremes
-        state.vy = Math.max(1, Math.min(state.vy, 14));
-
-        // Subtle horizontal drift back towards targetX (kept shared)
-        state.vx += ((state.targetX - (state.targetX)) * 0); // placeholder (no pull)
-        state.vx *= 0.99;
-      }
-
-      // 3) Apply shared velocity to all right particles, then integrate
-      for (let i = particles.current.length - 1; i >= 0; i--) {
-        const p = particles.current[i];
-        if (p.type !== "right" || p.structureId == null) continue;
-        const state = bunches.current.get(p.structureId);
-        if (!state) continue;
-
-        if (!p.isFading) {
-          // Everyone in the bunch gets the **same vy and vx** (optionally add tiny independent jitter in position only)
-          p.vx = state.vx + (Math.random() - 0.5) * 0.03; // tiny jitter that does not affect shared speed feel
-          p.vy = state.vy; // locked speed per bunch
-
-          // Start fading when the bunch is near its target
-          const dist = Math.hypot((p.targetX! - p.x), (p.targetY! - p.y));
-          if (p.y >= state.targetY - 10 || dist < 25) {
+          if (!p.isFading && dist > 15) {
+            const force = 0.03;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+            p.converged = false;
+            p.vx *= 0.95;
+            p.vy *= 0.97;
+          } else if (dist <= 15 || p.isFading) {
             p.converged = true;
             p.isFading = true;
+            p.alpha -= 0.01;
+            if (p.alpha <= 0) resetLeftParticle(p, canvas);
+            p.vx *= 0.8;
+            p.vy *= 0.8;
           }
-        } else {
-          // Fade out, keep decaying but still respect group vy trend a bit
-          p.alpha -= 0.008;
-          if (p.alpha <= 0) p.alpha = 0;
+
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha = Math.max(0, Math.min(1, p.alpha));
+        } else if (p.type === "right") {
+          // --- Right bunch moving downwards ---
+          const dx = p.targetX! - p.x;
+          const dy = p.targetY! - p.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (!p.isFading) {
+            if (p.y < p.targetY!) {
+              const brakeForce = 0.05; // ⚙️ lighter braking so they keep speed longer
+              p.vy += brakeForce * (p.targetY! - p.y) / 100;
+              p.vy *= 0.97;
+            } else {
+              p.vy *= 0.97;
+            }
+
+            p.vx += (Math.random() - 0.5) * RANDOM_JITTER_FORCE;
+            p.vy += (Math.random() - 0.5) * RANDOM_JITTER_FORCE;
+
+            if (p.y >= p.targetY! - 10 || dist < 25) {
+              p.converged = true;
+              p.isFading = true;
+            }
+          }
+
+          if (p.isFading) {
+            p.alpha -= 0.008;
+            if (p.alpha <= 0) p.alpha = 0;
+            p.vx *= 0.95;
+            p.vy *= 0.97;
+            p.vx += (Math.random() - 0.5) * 0.01;
+            p.vy += (Math.random() - 0.5) * 0.01;
+          }
+
+          p.x += p.vx;
+          p.y += p.vy;
           p.vx *= 0.95;
-          p.vy = state.vy * 0.9; // fade with slightly reduced speed
+          p.vy *= 0.97;
+          p.alpha = Math.max(0, Math.min(1, p.alpha));
+
+          if (p.alpha <= 0) {
+            particles.current.splice(i, 1);
+            continue;
+          }
         }
 
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vx *= 0.95;
-        p.vy *= 0.97;
-        p.alpha = Math.max(0, Math.min(1, p.alpha));
-
-        if (p.alpha <= 0) {
-          particles.current.splice(i, 1);
+        // Draw particle
+        if (p.alpha > 0) {
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
         }
       }
 
-      // Clean up empty bunches
-      // If no particle remains with a structureId, remove the bunch entry
-      const activeIds = new Set<number>();
-      for (const p of particles.current) if (p.type === "right" && p.structureId != null) activeIds.add(p.structureId);
-      for (const id of bunches.current.keys()) if (!activeIds.has(id)) bunches.current.delete(id);
-
-      // --- Draw particles ---
-      for (const p of particles.current) {
-        if (p.alpha <= 0) continue;
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // --- Draw connections: **only between particles in the same bunch** ---
-      // To avoid stale indices, compute connections on-the-fly per frame, restricted to same structureId.
+      // --- Draw connections ---
       for (let i = 0; i < particles.current.length; i++) {
         const p1 = particles.current[i];
-        if (p1.type !== "right" || p1.alpha <= 0) continue;
+        if (p1.type !== "right" || p1.alpha <= 0 || !p1.connections) continue;
 
-        for (let j = i + 1; j < particles.current.length; j++) {
-          const p2 = particles.current[j];
-          if (p2.type !== "right" || p2.alpha <= 0) continue;
+        for (const connection of p1.connections) {
+          const p2 = particles.current[connection.targetIndex];
+          if (!p2 || p2.alpha <= 0 || i >= connection.targetIndex) continue;
 
-          // ✅ Only connect within the SAME bunch
-          if (p1.structureId !== p2.structureId) continue;
+          const connectionColor =
+            p1.color === GOLD_COLOR
+              ? GOLD_CONNECTION_COLOR
+              : GREY_CONNECTION_COLOR;
+          const minAlpha = Math.min(p1.alpha, p2.alpha);
+          ctx.globalAlpha = minAlpha * 0.5;
+          ctx.strokeStyle = connectionColor;
+          ctx.lineWidth = connection.thickness;
 
           const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (dist < 80) {
-            const connectionColor = p1.color === GOLD_COLOR ? GOLD_CONNECTION_COLOR : GREY_CONNECTION_COLOR;
-            const minAlpha = Math.min(p1.alpha, p2.alpha);
-            ctx.globalAlpha = minAlpha * 0.5;
-            ctx.strokeStyle = connectionColor;
-            ctx.lineWidth = 2;
+          if (dist < 120) {
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
@@ -327,7 +303,6 @@ export const FlowParticleSystemMobile: React.FC = () => {
           }
         }
       }
-
       ctx.globalAlpha = 1;
     };
 
