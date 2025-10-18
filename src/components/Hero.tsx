@@ -68,11 +68,12 @@ export const Hero: React.FC = () => {
       </div>
 
       {/* --- Content Wrapper --- */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 mt-56 lg:mt-32 flex flex-col lg:block">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 mt-[50vh] sm:mt-56 lg:mt-32 flex flex-col lg:block">
+
         <div className="flex flex-col lg:block text-left space-y-8 lg:space-y-0">
           
           {/* Header */}
-          <h1 className="font-space-grotesk font-bold text-4xl sm:text-5xl lg:text-8xl leading-tight text-black mb-6 lg:mb-12 order-2 lg:order-1">
+          <h1 className="font-space-grotesk font-bold text-4xl sm:text-5xl lg:text-8xl leading-tight text-black lg:mb-12 order-2 lg:order-1">
             <div className="block">Decode</div>
             <div className="block">
               <span className="inline-block min-w-[100px] lg:min-w-[150px] text-[#4DAAE9]">
@@ -86,9 +87,9 @@ export const Hero: React.FC = () => {
           </h1>
 
           {/* Blurb */}
-          <p className="text-base sm:text-lg lg:text-xl text-black leading-relaxed mb-10 lg:mb-20 max-w-md sm:max-w-xl lg:max-w-3xl font-normal order-3 lg:order-2">
-            BHVRL specializes in fully managed advanced data analytics to unlock the hidden value in your company’s data
-          </p>
+          <p className="text-base sm:text-lg lg:text-xl text-black leading-relaxed mb-0 max-w-md sm:max-w-xl lg:max-w-3xl font-normal order-3 lg:order-2">
+  BHVRL specializes in fully managed advanced data analytics to unlock the hidden value in your company’s data
+</p>
         </div>
       </div>
 

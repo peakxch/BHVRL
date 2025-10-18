@@ -56,9 +56,11 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
     const isMobile = width < 768; // Tailwind 'md' breakpoint
     const anchorX = isMobile ? width / 2 : word === 'Process' ? width / 2 : width * 0.7;
     // ✅ Slightly lower on mobile to avoid text overlap
-    const anchorY = isMobile ? height * 0.55 : height / 2;
+    const anchorY = isMobile ? height * 0.70 : height / 2;
 
-    const humanMultiplier = word === 'Human' ? 1.3 : 1;
+    const humanMultiplier = word === 'Human' ? (isMobile ? 3 : 1.3) : 1;
+    const usageMultiplier = word === 'Usage' ? (isMobile ? 1.2 : 1.3) : 1;
+
 
     for (let i = 0; i < config.count; i++) {
       let x: number, y: number;
@@ -69,7 +71,7 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
           const ringCount = 3;
           const ringIndex = Math.floor(i / (config.count / ringCount));
           const angle = ((i % (config.count / ringCount)) / (config.count / ringCount)) * Math.PI * 2;
-          const ringRadius = (0.04 + ringIndex * 0.02) * Math.min(width, height) * scale * humanMultiplier;
+          const ringRadius = (0.04 + ringIndex * 0.02) * Math.min(width, height) * scale * humanMultiplier * usageMultiplier;
           x = anchorX + Math.cos(angle) * ringRadius;
           y = anchorY + Math.sin(angle) * ringRadius;
           break;
@@ -118,7 +120,7 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
         }
         case 'golden_spiral': {
           const goldenAngle = i * 0.618 * Math.PI;
-          const goldenRadius = Math.pow(1.618, i * 0.1) * 12.5 * scale * humanMultiplier;
+          const goldenRadius = Math.pow(1.618, i * 0.1) * 12.5 * scale * humanMultiplier * usageMultiplier;
           x = anchorX + Math.cos(goldenAngle) * goldenRadius;
           y = anchorY + Math.sin(goldenAngle) * goldenRadius;
           break;
