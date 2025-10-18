@@ -52,8 +52,11 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
 
     if (width === 0 || height === 0) return positions;
 
-    const anchorX = word === 'Process' ? width / 2 : width * 0.7;
-    const anchorY = height / 2;
+    // ✅ Center particles on mobile
+    const isMobile = width < 768; // Tailwind 'md' breakpoint
+    const anchorX = isMobile ? width / 2 : word === 'Process' ? width / 2 : width * 0.7;
+    // ✅ Slightly lower on mobile to avoid text overlap
+    const anchorY = isMobile ? height * 0.55 : height / 2;
 
     const humanMultiplier = word === 'Human' ? 1.3 : 1;
 
@@ -72,36 +75,27 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
           break;
         }
         case 'cube_projection': {
-          const cubeSize = 3; // number of points per edge (controls density)
-          const spacing = 40 * scale; // spacing between points
+          const cubeSize = 3; 
+          const spacing = 40 * scale;
           const offset = (cubeSize - 1) * spacing * 0.5;
-        
-          // stronger projection factors for real cube illusion
           const depthFactorX = 0.7;
           const depthFactorY = 0.45;
         
-          // create layered 3D cube projected into 2D space
           for (let xi = 0; xi < cubeSize; xi++) {
             for (let yi = 0; yi < cubeSize; yi++) {
               for (let zi = 0; zi < cubeSize; zi++) {
                 if (positions.length >= config.count) break;
-        
                 const x3d = xi * spacing - offset;
                 const y3d = yi * spacing - offset;
                 const z3d = zi * spacing - offset;
-        
-                // Apply isometric projection
                 const x2d = anchorX + (x3d - z3d * depthFactorX);
                 const y2d = anchorY + (y3d - z3d * depthFactorY);
-        
                 positions.push({ x: x2d, y: y2d });
               }
             }
           }
-        
           break;
         }
-        
         case 'hexagon': {
           const layer = Math.floor((Math.sqrt(12 * i + 9) - 3) / 6);
           const posInLayer = i - 3 * layer * (layer + 1);
@@ -112,8 +106,8 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
           break;
         }
         case 'wave': {
-          const minX = width * 0.45;
-          const maxX = width * 0.9;
+          const minX = isMobile ? width * 0.25 : width * 0.45;
+          const maxX = isMobile ? width * 0.75 : width * 0.9;
           const waveX = minX + ((i / config.count) * (maxX - minX));
           const waveY = Math.sin((i / config.count) * Math.PI * 4) * 40 * scale;
           const noiseX = (Math.random() - 0.5) * 60 * scale;
@@ -174,7 +168,6 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
   const morphToPattern = (newWord: string) => {
     const config = getParticleConfig(newWord);
     const newPositions = getTargetPositions(config, newWord);
-
     morphingRef.current = true;
 
     particlesRef.current.forEach((p, idx) => {
@@ -238,7 +231,6 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
       }
     }
 
-    // Draw fewer solid connecting lines for a cleaner look
     ctx.strokeStyle = PRIMARY_COLOR;
     ctx.lineWidth = 0.4 * scale;
     ctx.globalAlpha = 0.4;
@@ -249,7 +241,6 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
         const dx = a.x - b.x;
         const dy = a.y - b.y;
         const dist = Math.hypot(dx, dy);
-        // reduce number of connections by lowering distance threshold
         if (dist < 50 * scale) {
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -260,7 +251,6 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ word, className 
     }
     ctx.globalAlpha = 1;
 
-    // Draw particles
     for (const p of particlesRef.current) {
       ctx.fillStyle = p.color;
       ctx.beginPath();

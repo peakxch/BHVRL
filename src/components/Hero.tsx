@@ -61,18 +61,15 @@ export const Hero: React.FC = () => {
   }, [charIndex, isDeleting, wordIndex, typingSpeed, words, isWaiting, showCursor, blinkCount]);
 
   return (
-    <section className="relative pt-16 lg:pt-24 bg-white overflow-hidden">
-      
-      {/* --- Particle Background --- */}
-      <div className="absolute inset-0 opacity-50 sm:opacity-70 lg:opacity-100">
+    <section className="relative pt-12 lg:pt-24 bg-white overflow-hidden">
+      {/* --- Particle System --- */}
+      <div className="absolute top-0 left-0 w-full h-[40vh] sm:h-[50vh] mt-8 lg:h-full opacity-100 sm:opacity-80 sm:mt-10 lg:opacity-100 z-0">
         <ParticleSystem word={particleWord} />
       </div>
 
-      {/* --- Content Container --- */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 mt-24 lg:mt-32 flex flex-col lg:block">
-        
-        {/* MOBILE LAYOUT: stack vertically */}
-        <div className="flex flex-col lg:block text-center lg:text-left space-y-12 lg:space-y-0">
+      {/* --- Content Wrapper --- */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 mt-56 lg:mt-32 flex flex-col lg:block">
+        <div className="flex flex-col lg:block text-left space-y-8 lg:space-y-0">
           
           {/* Header */}
           <h1 className="font-space-grotesk font-bold text-4xl sm:text-5xl lg:text-8xl leading-tight text-black mb-6 lg:mb-12 order-2 lg:order-1">
@@ -88,10 +85,9 @@ export const Hero: React.FC = () => {
             <div className="block">Data</div>
           </h1>
 
-          {/* Blurb / Description */}
-          <p className="text-base sm:text-lg lg:text-xl text-black leading-relaxed mb-10 lg:mb-20 max-w-3xl mx-auto lg:mx-0 font-normal order-3 lg:order-2">
-            <span className="block">BHVRL specializes in fully managed advanced data analytics</span>
-            <span className="block">to unlock the hidden value in your company’s data</span>
+          {/* Blurb */}
+          <p className="text-base sm:text-lg lg:text-xl text-black leading-relaxed mb-10 lg:mb-20 max-w-md sm:max-w-xl lg:max-w-3xl font-normal order-3 lg:order-2">
+            BHVRL specializes in fully managed advanced data analytics to unlock the hidden value in your company’s data
           </p>
         </div>
       </div>
