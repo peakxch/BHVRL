@@ -185,7 +185,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const now = performance.now();
-      const EMIT_INTERVAL_RIGHT = 1500;
+      const EMIT_INTERVAL_RIGHT = 1200;
       if (now - lastEmitTimeRight.current > EMIT_INTERVAL_RIGHT) {
         emitRightBunch(canvas);
         lastEmitTimeRight.current = now;
