@@ -93,9 +93,9 @@ export const Hero: React.FC = () => {
           </h1>
 
           <p className="text-lg lg:text-xl text-black leading-relaxed mb-20 max-w-4xl font-normal">
-            <span className="block">BHVRL specializes in complex data analytics</span>
-            <span className="block">to unlock strategic and tactical decision-making—</span>
-            <span className="block">driving revenue growth, optimizing costs, and uncovering insights.</span>
+            <span className="block">BHVRL specializes in fully managed advanced data analytics</span>
+            <span className="block">to unlock the hidden value in your companies data</span>
+            
           </p>
         </div>
       </div>

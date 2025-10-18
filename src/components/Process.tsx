@@ -119,8 +119,8 @@ export const Process: React.FC = () => {
           </h2>
 
           <p className="text-gray-700 text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed relative">
-            Fully managed advanced analytics — transforming your
-            data into clear outputs and actionable systems that drive <strong>revenue growth</strong>,{" "}
+            BHRVL transforms data across your organisation into clear outputs and actionable systems that drive 
+            <strong> revenue growth</strong>,{" "}
             <strong>cost reduction</strong>,{" "}
             <strong>operational efficiency &</strong> {" "}
             <strong>deep insights</strong>.

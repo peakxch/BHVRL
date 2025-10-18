@@ -145,7 +145,7 @@ export const PerformanceNetwork: React.FC = () => {
       ctx.globalAlpha = 1;
     };
 
-    const drawParticles = (particles: Point[], color: string, r = 2) => {
+    const drawParticles = (particles: Point[], color: string, r = 3) => {
       const visibleCount = Math.floor(particles.length * revealProgress);
       ctx.fillStyle = color;
       for (let i = 0; i < visibleCount; i++) {
@@ -218,12 +218,12 @@ export const PerformanceNetwork: React.FC = () => {
       {/* BHVRL impact on [Metric] */}
       <div
         className="absolute  left-8 flex items-center space-x-4 font-space-grotesk font-bold"
-        style={{ fontSize: "32px", lineHeight: metricBoxHeight }}
+        style={{ fontSize: "46px", lineHeight: metricBoxHeight }}
       >
         {/* BHVRL in blue */}
         <span className="text-[#4DAAE9]">BHVRL</span>
         {/* Impact on in black */}
-        <span className="text-black">Impact On</span>
+        <span className="text-black">Impact On </span>
 
         {/* Metrics scroll container */}
         <div
@@ -244,7 +244,7 @@ export const PerformanceNetwork: React.FC = () => {
             {metrics.map((metric, i) => (
               <div
                 key={i}
-                className="text-[#000000]"
+                className="text-[#4DAAE9]"
                 style={{
                   height: metricBoxHeight,
                   lineHeight: metricBoxHeight,

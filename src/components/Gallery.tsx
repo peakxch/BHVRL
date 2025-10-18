@@ -42,14 +42,11 @@ export const Gallery: React.FC = () => {
   return (
     <section id="gallery" className="py-20 lg:py-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        <div className="text-center mb-16 lg:mb-18">
+        <div className="text-center ">
           <h2 className="font-space-grotesk font-bold text-3xl lg:text-5xl text-black mb-6">
             Case Studies
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Real challenges, real impact. Here's how we've helped 
-            organizations achieve transformational results.
-          </p>
+
         </div>
 
         <div className="relative">
