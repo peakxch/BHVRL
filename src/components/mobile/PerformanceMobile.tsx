@@ -6,7 +6,7 @@ export const PerformanceMobile: React.FC = () => {
     <section className="relative flex flex-col items-center justify-start bg-white overflow-hidden min-h-screen px-8 py-20">
       {/* Header */}
       <div className="relative z-10 w-full max-w-md text-center">
-        <h2 className="font-space-grotesk text-4xl font-bold text-black mb-8 mt-6 leading-tight">
+        <h2 className="font-space-grotesk text-4xl font-bold text-black mb-8 mt-12 leading-tight">
           Only Pay For{" "}
           <span className="relative inline-block text-[#4DAAE9] font-bold">
             Performance
