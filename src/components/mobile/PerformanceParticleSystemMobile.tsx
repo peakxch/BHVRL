@@ -50,7 +50,7 @@ export const PerformanceNetwork: React.FC = () => {
     const usableWidth = width * 0.92; // ✅ tighter range to keep within box
     const rightBuffer = width * rightBufferRatio;
     const cGrey = 0.000002;
-    const stepSigma = height * 0.04;
+    const stepSigma = height * 0.02;
 
     const clamp = (v: number, min: number, max: number) =>
       Math.max(min, Math.min(max, v));
