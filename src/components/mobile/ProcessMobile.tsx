@@ -43,7 +43,7 @@ export const ProcessMobile: React.FC = () => {
 
       {/* Frosted Glass Box (auto-sized to content) */}
       <div
-        className="relative z-10 max-w-lg mx-auto  rounded-3xl text-left"
+        className="relative z-10 max-w-lg mx-auto mt-20 rounded-3xl text-left"
         style={{
         
           backdropFilter: "blur(26px) brightness(1.08)",
@@ -56,7 +56,7 @@ export const ProcessMobile: React.FC = () => {
           boxShadow: "0 0 60px 20px rgba(255, 255, 255, 0.7)",
         }}
       >
-        <h2 className="font-space-grotesk font-bold text-5xl text-black leading-tight">
+        <h2 className="font-space-grotesk font-bold text-5xl  text-black leading-tight">
           From Data
           <br />
           To{" "}
