@@ -68,9 +68,8 @@ export const ProcessMobile: React.FC = () => {
           </span>
         </h2>
 
-        <p className="text-base text-gray-700 mt-4 leading-relaxed">
-          BHVRL transforms behavioral data into actionable intelligence that
-          powers better outcomes across marketing, product, and innovation.
+        <p className="text-base text-gray-700 mt-4 leading-relaxed text-center">
+        BHRVL transforms the data across your organisation into clear outputs and actionable systems that drive revenue growth, cost reduction, operational efficiency & deep insights.
         </p>
       </div>
     </section>

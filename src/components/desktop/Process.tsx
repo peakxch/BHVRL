@@ -154,8 +154,8 @@ export const Process: React.FC = () => {
             </h2>
           )}
 
-          <p className="text-gray-700 text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed relative">
-            BHRVL transforms data across your organisation into clear outputs
+          <p className="text-gray-700 text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed relative ">
+            BHRVL transforms the data across your organisation into clear outputs
             and actionable systems that drive
             <strong> revenue growth</strong>, <strong>cost reduction</strong>,{" "}
             <strong>operational efficiency &</strong> <strong>deep insights</strong>.
