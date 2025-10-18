@@ -57,7 +57,7 @@ export const Process: React.FC = () => {
     <section
       id="process"
       // CHANGED: Reverted to bg-white
-      className="relative py-32 lg:py-26 lg:pb-30 bg-white overflow-hidden" 
+      className="relative py-28 lg:py-26 lg:pb-30 bg-white overflow-hidden" 
     >
       {/* 1. Large, Fuzzy Blurb Background (Z-index 1) */}
       <div style={BLURB_STYLE} />

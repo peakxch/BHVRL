@@ -4,30 +4,36 @@ import { ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 export const Gallery: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+ 
+
   const cases = [
     {
       title: "Retail Transformation",
       description: "Helped a legacy retailer increase online revenue by 340% through digital strategy.",
-      category: "Digital Strategy",
-      image: "https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=800"
+      category: "South Africa",
+      industry: "Telecommunications",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom.png"
     },
     {
       title: "Market Expansion",
       description: "Guided a SaaS startup's successful entry into European markets.",
       category: "Growth Strategy",
-      image: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800"
+      industry: "South Africa",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
     },
     {
       title: "Organizational Restructure",
       description: "Redesigned operations for a manufacturing company, reducing costs by 25%.",
       category: "Operations",
-      image: "https://images.pexels.com/photos/1181403/pexels-photo-1181403.jpeg?auto=compress&cs=tinysrgb&w=800"
+      industry: "South Africa",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
     },
     {
       title: "Innovation Framework",
       description: "Established R&D processes that accelerated product development by 60%.",
       category: "Innovation",
-      image: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=800"
+      industry: "South Africa",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
     }
   ];
 
@@ -46,7 +52,6 @@ export const Gallery: React.FC = () => {
           <h2 className="font-space-grotesk font-bold text-3xl lg:text-5xl text-black mb-6">
             Case Studies
           </h2>
-
         </div>
 
         <div className="relative">
@@ -70,14 +75,16 @@ export const Gallery: React.FC = () => {
                       />
                     </div>
                     <div className="p-8">
-                      <div className="text-sm font-medium text-blue-500 mb-3">
+                      <div className="text-l font-medium text-blue-500 mb-3">
+                        {case_study.industry}
+                      </div>
+                      <div className="text-sm font-medium text-gray-400 mb-3">
                         {case_study.category}
                       </div>
                       <h3 className="font-space-grotesk font-semibold text-xl lg:text-2xl text-black mb-4">
                         {case_study.title}
                       </h3>
-                      <p className="text-gray-600 leading禁止
-                        leading-relaxed mb-6">
+                      <p className="text-gray-600 leading-relaxed mb-6">
                         {case_study.description}
                       </p>
                       <button className="flex items-center gap-2 text-black hover:text-blue-500 transition-colors duration-300 font-medium">
