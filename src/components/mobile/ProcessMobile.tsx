@@ -57,7 +57,7 @@ export const ProcessMobile: React.FC = () => {
         }}
       >
         <h2 className="font-space-grotesk font-bold text-5xl text-black leading-tight">
-          From <span className="text-[#4DAAE9]">Data</span>
+          From Data
           <br />
           To{" "}
           <span
