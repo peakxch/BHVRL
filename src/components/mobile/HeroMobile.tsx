@@ -95,7 +95,7 @@ export const HeroMobile: React.FC = () => {
         onClick={() =>
           document.getElementById('process-mobile')?.scrollIntoView({ behavior: 'smooth' })
         }
-        className="cursor-pointer mt-3 mb-6 flex justify-center text-sm text-gray-500"
+        className="cursor-pointer mt-3 mb-10 flex justify-center text-sm text-gray-500"
       >
         Scroll to discover more ↓
       </div>
