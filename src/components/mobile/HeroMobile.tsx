@@ -84,7 +84,7 @@ export const HeroMobile: React.FC = () => {
             <div className="block">Data</div>
           </h1>
 
-          <p className="text-base sm:text-lg text-black leading-relaxed max-w-md">
+          <p className="text-base sm:text-lg text-black leading-relaxed max-w-md mb-3">
             BHVRL specializes in fully managed advanced data analytics to unlock the hidden value in your company’s data.
           </p>
         </div>
