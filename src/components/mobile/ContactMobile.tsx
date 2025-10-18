@@ -47,6 +47,9 @@ export const ContactMobile: React.FC = () => {
           >
             info@bhvrl.com
           </a>
+          <p className="text-white text-sm">
+          Or use the form below
+          </p>
         {/* Contact form */}
         <form
           onSubmit={handleSubmit}
