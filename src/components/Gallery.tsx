@@ -41,6 +41,13 @@ export const Gallery: React.FC = () => {
       country: "Germany",
       industry: "Consumer Audio",
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Sennheiser2.png"
+    },
+    {
+      title: "Customer Evolution",
+      description: "Created a hollistic understanding of how customers evolve into different usage and revenue segments and how to cultivate higher value customers through targeted marketing and stimulation",
+      country: "Egypt",
+      industry: "Telecommunications",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Etisalat1.png"
     }
   ];
 
