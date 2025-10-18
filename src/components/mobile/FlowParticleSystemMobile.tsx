@@ -314,7 +314,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
           if (p1.structureId !== p2.structureId) continue;
 
           const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (dist < 120) {
+          if (dist < 80) {
             const connectionColor = p1.color === GOLD_COLOR ? GOLD_CONNECTION_COLOR : GREY_CONNECTION_COLOR;
             const minAlpha = Math.min(p1.alpha, p2.alpha);
             ctx.globalAlpha = minAlpha * 0.5;
