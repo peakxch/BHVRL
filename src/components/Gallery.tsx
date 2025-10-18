@@ -36,6 +36,13 @@ export const Gallery: React.FC = () => {
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Wetility1.png"
     },
     {
+      title: "Logistics Intelligence",
+      description: "Used telematics devices to create a deep intelligence for mining aggregate logistics operating across Africa to prevent theft and ensure delivery time frames",
+      country: "Africa",
+      industry: "Logistics",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/TrackSmart.png"
+    },
+    {
       title: "Channel Pricing Stabilization",
       description: "Developed a pricing tool that used current channel sales, competitor pricing and vendor pricing to determine the best price given market conditions",
       country: "Germany",
@@ -48,6 +55,14 @@ export const Gallery: React.FC = () => {
       country: "Egypt",
       industry: "Telecommunications",
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Etisalat1.png"
+    },
+   
+    {
+      title: "Fruit Bruising Prevention",
+      description: "Using telematics and weather data to understand impacts along collection and transportation of fruit before packing and ripening operations leading to a 24% decrease in bruised fruits",
+      country: "South Africa",
+      industry: "Agriculture",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Parkd.png"
     }
   ];
 
