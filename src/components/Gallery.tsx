@@ -29,11 +29,11 @@ export const Gallery: React.FC = () => {
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Credit1.png"
     },
     {
-      title: "Innovation Framework",
-      description: "Established R&D processes that accelerated product development by 60%.",
-      country: "Innovation",
-      industry: "South Africa",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
+      title: "Billing Incentivization",
+      description: "Derived deep insights into customer billing behaviour to firstly target better paying new customers and new ways of incentivizing existing billing leading to a 9% increase in on time payments and 24% increase in new customer on time payments",
+      country: "South Africa",
+      industry: "Solar Energy",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Wetility1.png"
     },
     {
       title: "Channel Pricing Stabilization",
