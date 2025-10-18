@@ -229,7 +229,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
 
           if (!p.isFading) {
             if (p.y < p.targetY!) {
-              const brakeForce = 0.01; // ⚙️ lighter braking so they keep speed longer
+              const brakeForce = 0.03; // ⚙️ lighter braking so they keep speed longer
               p.vy += brakeForce * (p.targetY! - p.y) / 100;
               p.vy *= 0.97;
             } else {

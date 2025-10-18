@@ -199,7 +199,7 @@ export const FlowParticleSystem: React.FC = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
         
       const now = performance.now();
-      const EMIT_INTERVAL_RIGHT = 4000; 
+      const EMIT_INTERVAL_RIGHT = 1500; 
 
       if (now - lastEmitTimeRight.current > EMIT_INTERVAL_RIGHT) {
         emitRightBunch(canvas);
@@ -252,7 +252,7 @@ export const FlowParticleSystem: React.FC = () => {
           if (!p.isFading) {
               
             if (p.x < p.targetX!) {
-                const brakeForce = 0.005;
+                const brakeForce = 0.03;
                 p.vx += brakeForce * (p.targetX! - p.x) / 100;
                 p.vx *= 0.95; // Matched damping to left particles
             } else {
