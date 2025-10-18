@@ -21,8 +21,8 @@ export const PerformanceMobile: React.FC = () => {
 
         {/* Blurb */}
         <p className="text-gray-700 text-lg leading-relaxed mb-5">
-          Measurable success through impact. Every system deployed is tied
-          directly to measurable business outcomes. Fees are tied to quantifiable impact.
+          Measurable success through impact. Every system deployed is
+          directly measurable against business outcomes. Fees are tied to quantifiable impact.
         </p>
       </div>
 
