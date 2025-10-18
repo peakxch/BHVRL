@@ -84,7 +84,7 @@ export const HeroMobile: React.FC = () => {
             <div className="block">Data</div>
           </h1>
 
-          <p className="text-base sm:text-lg text-black leading-relaxed max-w-md mb-3">
+          <p className="text-base sm:text-lg text-black leading-relaxed max-w-md mb-6">
             BHVRL specializes in fully managed advanced data analytics to unlock the hidden value in your company’s data.
           </p>
         </div>
@@ -95,7 +95,7 @@ export const HeroMobile: React.FC = () => {
         onClick={() =>
           document.getElementById('process-mobile')?.scrollIntoView({ behavior: 'smooth' })
         }
-        className="cursor-pointer mt-3 mb-24 flex justify-center text-sm text-gray-500"
+        className="cursor-pointer mt-6 mb-24 flex justify-center text-sm text-gray-500"
       >
         Scroll to discover more ↓
       </div>
