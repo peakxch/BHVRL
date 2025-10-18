@@ -47,6 +47,7 @@ export const PerformanceNetwork: React.FC = () => {
     let width = (canvas.width = canvas.offsetWidth);
     let height = (canvas.height = canvas.offsetHeight);
 
+    const usableWidth = width * 0.92; // ✅ tighter range to keep within box
     const rightBuffer = width * rightBufferRatio;
     const cGrey = 0.000002;
     const stepSigma = height * 0.04;
@@ -57,7 +58,6 @@ export const PerformanceNetwork: React.FC = () => {
     const generateCurve = (c: number) => {
       const pts: { x: number; y: number }[] = [];
       let accumulatedNoise = 0;
-      const usableWidth = width - rightBuffer;
       const linearSlope = -(c * usableWidth * usableWidth) / 4;
       for (let i = 0; i < numPoints; i++) {
         const x = (i / (numPoints - 1)) * usableWidth;
@@ -69,7 +69,7 @@ export const PerformanceNetwork: React.FC = () => {
           (1 + Math.sin(t * Math.PI * 4) * 2 + Math.sin(t * Math.PI * 8)) * fade;
         accumulatedNoise += (Math.random() - 0.5) * stepSigma * localScale;
         y = clamp(y + accumulatedNoise + height * 0.1, height * 0.1, height * 0.9);
-        pts.push({ x, y });
+        pts.push({ x: x + rightBuffer * 0.25, y }); // ✅ adds margin on both sides
       }
       return pts.slice(0, Math.floor(pts.length * trimRatio));
     };
@@ -89,7 +89,7 @@ export const PerformanceNetwork: React.FC = () => {
       return { x: p.x, y: clamp(p.y + uplift, height * 0.1, height * 0.85) };
     });
     let greyParticles = generateParticles(baseCurve);
-    let greenParticles = generateParticles(upliftedCurve);
+    let blueParticles = generateParticles(upliftedCurve);
 
     let revealProgress = 0;
     const revealSpeed = 0.008;
@@ -108,11 +108,13 @@ export const PerformanceNetwork: React.FC = () => {
       ctx.restore();
     };
 
-    // 🧩 Draw connections but cap by 10% height
+    // ✅ Now clamps lines horizontally as well as vertically
     const drawConnections = (particles: Point[], color: string, maxDist: number) => {
       const visibleCount = Math.floor(particles.length * revealProgress);
       const topLimit = height * 0.1;
       const bottomLimit = height * 0.9;
+      const leftLimit = width * 0.05;
+      const rightLimit = width * 0.95;
 
       ctx.strokeStyle = color;
       ctx.lineWidth = 1;
@@ -120,18 +122,30 @@ export const PerformanceNetwork: React.FC = () => {
 
       for (let i = 0; i < visibleCount; i++) {
         const p1 = particles[i];
-        if (p1.y < topLimit || p1.y > bottomLimit) continue; // cap lines vertically
+        if (
+          p1.y < topLimit ||
+          p1.y > bottomLimit ||
+          p1.x < leftLimit ||
+          p1.x > rightLimit
+        )
+          continue;
 
         const distances: { j: number; d: number }[] = [];
-
         for (let j = 0; j < visibleCount; j++) {
           if (i === j) continue;
           const p2 = particles[j];
+          if (
+            p2.y < topLimit ||
+            p2.y > bottomLimit ||
+            p2.x < leftLimit ||
+            p2.x > rightLimit
+          )
+            continue;
+
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < maxDist && p2.y >= topLimit && p2.y <= bottomLimit)
-            distances.push({ j, d });
+          if (d < maxDist) distances.push({ j, d });
         }
 
         distances
@@ -154,10 +168,18 @@ export const PerformanceNetwork: React.FC = () => {
       ctx.fillStyle = color;
       const topLimit = height * 0.1;
       const bottomLimit = height * 0.9;
+      const leftLimit = width * 0.05;
+      const rightLimit = width * 0.95;
 
       for (let i = 0; i < visibleCount; i++) {
         const p = particles[i];
-        if (p.y < topLimit || p.y > bottomLimit) continue; // cap points vertically
+        if (
+          p.y < topLimit ||
+          p.y > bottomLimit ||
+          p.x < leftLimit ||
+          p.x > rightLimit
+        )
+          continue;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
         ctx.fill();
@@ -167,6 +189,8 @@ export const PerformanceNetwork: React.FC = () => {
     const updateParticles = (particles: Point[], curve: { x: number; y: number }[]) => {
       const topLimit = height * 0.1;
       const bottomLimit = height * 0.9;
+      const leftLimit = width * 0.05;
+      const rightLimit = width * 0.95;
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -177,8 +201,8 @@ export const PerformanceNetwork: React.FC = () => {
         p.vy += (target.y - p.y) * 0.002;
         p.vx += (Math.random() - 0.5) * 0.01;
         p.vy += (Math.random() - 0.5) * 0.01;
-        p.x = clamp(p.x, 0, width);
-        p.y = clamp(p.y, topLimit, bottomLimit); // ⛔ cap motion to 10%–90%
+        p.x = clamp(p.x, leftLimit, rightLimit);
+        p.y = clamp(p.y, topLimit, bottomLimit);
       }
     };
 
@@ -188,13 +212,13 @@ export const PerformanceNetwork: React.FC = () => {
       revealProgress = Math.min(revealProgress + revealSpeed, 1);
 
       updateParticles(greyParticles, baseCurve);
-      updateParticles(greenParticles, upliftedCurve);
+      updateParticles(blueParticles, upliftedCurve);
 
-      drawConnections(greyParticles, "rgba(150,150,150,0.5)", 60);
+      drawConnections(greyParticles, "rgba(150,150,150,0.4)", 55);
       drawParticles(greyParticles, "rgba(150,150,150,0.7)");
 
-      drawConnections(greenParticles, "#4DAAE9", 65);
-      drawParticles(greenParticles, "#4DAAE9");
+      drawConnections(blueParticles, "#4DAAE9", 60);
+      drawParticles(blueParticles, "#4DAAE9");
 
       frameId = requestAnimationFrame(animate);
     };
@@ -220,9 +244,8 @@ export const PerformanceNetwork: React.FC = () => {
         className="absolute inset-0 w-full h-full"
         style={{ pointerEvents: "none" }}
       />
-
       <div
-        className="absolute left-8 mb-2 flex items-center font-space-grotesk font-bold"
+        className="absolute  mb-2 flex items-center font-space-grotesk font-bold"
         style={{
           fontSize: "20px",
           whiteSpace: "nowrap",
@@ -230,7 +253,6 @@ export const PerformanceNetwork: React.FC = () => {
       >
         <span className="text-[#4DAAE9] mr-1">BHVRL</span>
         <span className="text-black mr-1">Impact On</span>
-
         <div
           className="overflow-hidden"
           style={{
