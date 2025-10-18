@@ -36,6 +36,7 @@ export const Hero: React.FC = () => {
       }
 
       if (!isDeleting && charIndex < current.length) {
+        setParticleWord(current);
         setCurrentWord(current.substring(0, charIndex + 1));
         setCharIndex(charIndex + 1);
         setTypingSpeed(150);
@@ -46,11 +47,12 @@ export const Hero: React.FC = () => {
         setTypingSpeed(100);
         setShowCursor(true);
       } else if (!isDeleting && charIndex === current.length) {
-        setParticleWord(current);
+        
         setIsWaiting(true);
         setBlinkCount(0);
         setTypingSpeed(300);
       } else if (isDeleting && charIndex === 0) {
+        
         setIsDeleting(false);
         setWordIndex((prev) => (prev + 1) % words.length);
         setCharIndex(0);
