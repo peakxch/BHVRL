@@ -88,7 +88,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
     const particlesPerBunch = Math.floor(Math.random() * 5) + 3;
 
     const startY = canvas.height * 0.4;
-    const targetY = canvas.height * 1.4 + Math.random() * 50 - 25;
+    const targetY = canvas.height * 1.8 + Math.random() * 50 - 25;
     const targetX = canvas.width * 0.5 + Math.random() * 10;
     const horizontalRadius = 20 + Math.random() * 20;
     const verticalRadius = 20 + Math.random() * 30;
@@ -169,7 +169,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
           alpha: 1,
           color: Math.random() < 0.1 ? "rgba(0,0,0,0.6)" : GOLD_COLOR,
           vx: (Math.random() - 0.5) * 0.5,
-          vy: 3 + Math.random() * 2,
+          vy: 2 + Math.random() * 2,
           type: "left",
           targetX: target.x,
           targetY: target.y,
@@ -229,7 +229,7 @@ export const FlowParticleSystemMobile: React.FC = () => {
 
           if (!p.isFading) {
             if (p.y < p.targetY!) {
-              const brakeForce = 0.05; // ⚙️ lighter braking so they keep speed longer
+              const brakeForce = 0.021; // ⚙️ lighter braking so they keep speed longer
               p.vy += brakeForce * (p.targetY! - p.y) / 100;
               p.vy *= 0.97;
             } else {
