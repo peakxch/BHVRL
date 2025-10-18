@@ -254,12 +254,15 @@ export const PerformanceNetwork: React.FC = () => {
         <span className="text-[#4DAAE9] mr-1">BHVRL</span>
         <span className="text-black mr-1">Impact On</span>
         <div
-          className="overflow-hidden"
-          style={{
-            height: "1em",
-            width: "8rem",
-          }}
-        >
+  className="overflow-hidden"
+  style={{
+    height: "1.1em", // 🔧 slightly taller to fully mask during transitions
+    width: "8rem",
+    maskImage: "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+    WebkitMaskImage:
+      "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+  }}
+>
           <div
             className={`${
               isTransitioning ? "transition-transform duration-700 ease-in-out" : ""
