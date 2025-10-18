@@ -18,17 +18,16 @@ const ContactParticleSystem: React.FC<ContactParticleSystemProps> = ({ children 
   const particlesRef = useRef<Particle[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Configuration for the particle network
   const config = {
     particleCount: 100,
     particleColor: '#ffffff',
     particleRadius: 2,
     lineColor: '#ffffff',
-    maxLineDistance: 120,
+    maxLineDistance: 80, // ✅ reduced from ~120 → tighter connections, fewer lines
     maxSpeed: 0.5,
+    background: '#000000',
   };
 
-  // Generates random particle positions and velocities
   const initializeParticles = useCallback(() => {
     const particles: Particle[] = [];
     for (let i = 0; i < config.particleCount; i++) {
@@ -43,68 +42,65 @@ const ContactParticleSystem: React.FC<ContactParticleSystemProps> = ({ children 
     particlesRef.current = particles;
   }, [dimensions.width, dimensions.height]);
 
-  // Animation loop
   const animate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Fill the background with black
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    const { width, height } = dimensions;
     const particles = particlesRef.current;
 
-    // Update particle positions and draw lines
-    particles.forEach(p1 => {
-      // Update position
-      p1.x += p1.vx;
-      p1.y += p1.vy;
+    ctx.fillStyle = config.background;
+    ctx.fillRect(0, 0, width, height);
 
-      // Wrap around the edges
-      if (p1.x > dimensions.width) p1.x = 0;
-      else if (p1.x < 0) p1.x = dimensions.width;
-      if (p1.y > dimensions.height) p1.y = 0;
-      else if (p1.y < 0) p1.y = dimensions.height;
+    // Move particles
+    for (let p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
 
-      // Draw lines to nearby particles
-      particles.forEach(p2 => {
-        const distance = Math.sqrt(
-          Math.pow(p1.x - p2.x, 2) +
-          Math.pow(p1.y - p2.y, 2)
-        );
+      if (p.x > width) p.x = 0;
+      else if (p.x < 0) p.x = width;
+      if (p.y > height) p.y = 0;
+      else if (p.y < 0) p.y = height;
+    }
 
-        if (distance < config.maxLineDistance) {
-          const alpha = 1 - distance / config.maxLineDistance;
-          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+    // Draw connections — only within new smaller distance
+    for (let i = 0; i < particles.length; i++) {
+      const p1 = particles[i];
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < config.maxLineDistance) {
+          const alpha = 1 - dist / config.maxLineDistance;
+          ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(p1.x, p1.y);
           ctx.lineTo(p2.x, p2.y);
           ctx.stroke();
         }
-      });
-    });
+      }
+    }
 
     // Draw particles
-    particles.forEach(particle => {
+    for (let p of particles) {
       ctx.fillStyle = config.particleColor;
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, config.particleRadius, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, config.particleRadius, 0, Math.PI * 2);
       ctx.fill();
-    });
+    }
 
     animationRef.current = requestAnimationFrame(animate);
   }, [config, dimensions]);
 
-  // Handle canvas resize and initialization
   useEffect(() => {
     const updateDimensions = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-
       const parent = canvas.parentElement;
       if (!parent) return;
 
@@ -117,25 +113,16 @@ const ContactParticleSystem: React.FC<ContactParticleSystemProps> = ({ children 
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
-
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-    };
+    return () => window.removeEventListener('resize', updateDimensions);
   }, [initializeParticles]);
 
-  // Start the animation loop once dimensions and particles are ready
   useEffect(() => {
     if (dimensions.width > 0 && dimensions.height > 0) {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
       animationRef.current = requestAnimationFrame(animate);
     }
-    
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [animate, dimensions]);
 

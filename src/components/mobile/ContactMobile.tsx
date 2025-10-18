@@ -33,14 +33,20 @@ export const ContactMobile: React.FC = () => {
 
       {/* Main content */}
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center justify-center text-center">
-        <h2 className="font-space-grotesk font-bold text-4xl mb-3">
+        <h2 className="font-space-grotesk font-bold text-4xl mb-3 mt-3">
           Let’s Connect
         </h2>
-        <p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-8">
-          We collaborate with forward-thinking teams to turn behavioral
-          intelligence into measurable impact.
+        <p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-2">
+            BHVRL offer free impact assessments to gauge how our solutions can drive value for your business
         </p>
-
+        <p className="text-white text-sm">
+          Email us at{" "}
+          <a
+            href="mailto:info@bhvrl.com"
+            className="text-[#4DAAE9] underline hover:text-[#3b94cc]"
+          >
+            info@bhvrl.com
+          </a>
         {/* Contact form */}
         <form
           onSubmit={handleSubmit}
@@ -51,7 +57,7 @@ export const ContactMobile: React.FC = () => {
             name="name"
             value={form.name}
             onChange={handleChange}
-            placeholder="Your Name"
+            placeholder="Name"
             required
             className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
           />
@@ -61,7 +67,17 @@ export const ContactMobile: React.FC = () => {
             name="email"
             value={form.email}
             onChange={handleChange}
-            placeholder="Your Email"
+            placeholder="Email"
+            required
+            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
+          />
+
+            <input
+            type="Company"
+            name="Company"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Company Name"
             required
             className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
           />
@@ -85,14 +101,7 @@ export const ContactMobile: React.FC = () => {
         </form>
 
         {/* Footer */}
-        <p className="text-gray-400 text-sm mt-6">
-          Or email us directly at{" "}
-          <a
-            href="mailto:info@bhvrl.com"
-            className="text-[#4DAAE9] underline hover:text-[#3b94cc]"
-          >
-            info@bhvrl.com
-          </a>
+
         </p>
       </div>
     </section>
