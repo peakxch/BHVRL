@@ -1,115 +1,75 @@
-// components/mobile/ProcessMobile.tsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FlowParticleSystemMobile } from "./FlowParticleSystemMobile";
-
-const BLURB_STYLE: React.CSSProperties = {
-  position: "absolute",
-  left: "50%",
-  top: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "75vw",
-  height: "60vh",
-  borderRadius: "50% / 60%",
-  backgroundColor: "rgba(255, 255, 255, 0.8)",
-  filter: "blur(18px)",
-  pointerEvents: "none",
-  zIndex: 1,
-};
-
-const TEXT_BOX_STYLE: React.CSSProperties = {
-  backgroundColor: "rgba(255, 255, 255, 0.95)",
-  padding: "1rem 1.25rem",
-  borderRadius: "1px",
-  boxShadow: "0 0 50px 15px rgba(255, 255, 255, 0.6)",
-  position: "relative",
-  maxWidth: "90%",
-  margin: "0 auto",
-};
 
 export const ProcessMobile: React.FC = () => {
   const words = ["Decision", "Action", "Insight"];
-  const [index, setIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [currentWord, setCurrentWord] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [charIndex, setCharIndex] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(150);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setIndex((prev) => (prev + 1) % (words.length + 1));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (index === words.length) {
-      const timeout = setTimeout(() => {
-        setIsTransitioning(false);
-        setIndex(0);
-      }, 700);
-      return () => clearTimeout(timeout);
-    }
-  }, [index, words.length]);
+    const type = () => {
+      const current = words[wordIndex];
+      if (!isDeleting && charIndex < current.length) {
+        setCurrentWord(current.substring(0, charIndex + 1));
+        setCharIndex((c) => c + 1);
+        setTypingSpeed(150);
+      } else if (isDeleting && charIndex > 0) {
+        setCurrentWord(current.substring(0, charIndex - 1));
+        setCharIndex((c) => c - 1);
+        setTypingSpeed(100);
+      } else if (!isDeleting && charIndex === current.length) {
+        setTimeout(() => setIsDeleting(true), 900);
+      } else if (isDeleting && charIndex === 0) {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+      }
+    };
+    const t = setTimeout(type, typingSpeed);
+    return () => clearTimeout(t);
+  }, [charIndex, isDeleting, wordIndex, typingSpeed, words]);
 
   return (
     <section
       id="process-mobile"
-      className="relative flex flex-col items-center justify-center min-h-[90vh] bg-white overflow-hidden px-4 py-20"
+      className="relative flex flex-col justify-center bg-white overflow-hidden min-h-screen px-6 py-20"
     >
-      {/* Background blur */}
-      <div style={BLURB_STYLE} />
-
-      {/* Particles */}
+      {/* Particle background */}
       <div className="absolute inset-0 z-0">
         <FlowParticleSystemMobile />
       </div>
 
-      {/* Content */}
+      {/* Frosted Glass Box (auto-sized to content) */}
       <div
-        className="relative z-10 flex flex-col items-center justify-center text-center"
-        style={TEXT_BOX_STYLE}
+        className="relative z-10 max-w-lg mx-auto  rounded-3xl text-left"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.35) 100%)",
+          backdropFilter: "blur(26px) brightness(1.08)",
+          WebkitBackdropFilter: "blur(26px) brightness(1.08)",
+          border: "1px solid rgba(255,255,255,0.25)",
+          // ✅ soft outer glow spreading outward
+          boxShadow:
+            "0 0 60px 25px rgba(255,255,255,0.35), 0 0 120px 40px rgba(255,255,255,0.25)",
+        }}
       >
-        <h2 className="font-space-grotesk font-bold text-4xl text-black mb-4 leading-tight flex flex-col items-center justify-center">
-          <span className="block text-center mb-2">From Data</span>
-          <span className="block text-center flex items-center justify-center">
-            To&nbsp;
-            <div
-              className="overflow-hidden inline-block align-bottom"
-              style={{
-                height: "1.2em",
-                width: "8rem",
-                lineHeight: "1.2em",
-              }}
-            >
-              <div
-                className={`${
-                  isTransitioning
-                    ? "transition-transform duration-700 ease-in-out"
-                    : ""
-                }`}
-                style={{
-                  transform: `translateY(-${index * 1.2}em)`,
-                }}
-              >
-                {words.map((word, i) => (
-                  <div
-                    key={i}
-                    className="text-[#4DAAE9] h-[1.2em] flex items-center justify-center"
-                  >
-                    {word}
-                  </div>
-                ))}
-                <div className="text-[#4DAAE9] h-[1.2em] flex items-center justify-center">
-                  {words[0]}
-                </div>
-              </div>
-            </div>
+        <h2 className="font-space-grotesk font-bold text-5xl text-black leading-tight">
+          From <span className="text-[#4DAAE9]">Data</span>
+          <br />
+          To{" "}
+          <span
+            className="text-[#4DAAE9] inline-block"
+            style={{ minWidth: "12rem" }}
+          >
+            {currentWord}
           </span>
         </h2>
 
-        <p className="text-gray-700 text-base leading-relaxed max-w-md mx-auto">
-          BHVRL transforms data across your organisation into clear outputs
-          and actionable systems that drive
-          <strong> revenue growth</strong>, <strong> cost reduction</strong>,
-          <strong> operational efficiency</strong> and <strong> deep insights</strong>.
+        <p className="text-base text-gray-700 mt-4 leading-relaxed">
+          BHVRL transforms behavioral data into actionable intelligence that
+          powers better outcomes across marketing, product, and innovation.
         </p>
       </div>
     </section>
