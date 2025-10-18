@@ -18,7 +18,7 @@ export const PerformanceNetwork: React.FC = () => {
   const trimRatio = 0.9;
   const rightBufferRatio = 0.08;
   const upliftStart = -10;
-  const upliftEnd = -120;
+  const upliftEnd = -100;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -92,7 +92,7 @@ export const PerformanceNetwork: React.FC = () => {
     let blueParticles = generateParticles(upliftedCurve);
 
     let revealProgress = 0;
-    const revealSpeed = 0.008;
+    const revealSpeed = 0.02;
     let frameId: number;
 
     const drawAxes = () => {
@@ -163,7 +163,7 @@ export const PerformanceNetwork: React.FC = () => {
       ctx.globalAlpha = 1;
     };
 
-    const drawParticles = (particles: Point[], color: string, r = 3) => {
+    const drawParticles = (particles: Point[], color: string, r = 2) => {
       const visibleCount = Math.floor(particles.length * revealProgress);
       ctx.fillStyle = color;
       const topLimit = height * 0.1;
@@ -214,10 +214,10 @@ export const PerformanceNetwork: React.FC = () => {
       updateParticles(greyParticles, baseCurve);
       updateParticles(blueParticles, upliftedCurve);
 
-      drawConnections(greyParticles, "rgba(150,150,150,0.4)", 55);
+      drawConnections(greyParticles, "rgba(150,150,150,0.4)", 70);
       drawParticles(greyParticles, "rgba(150,150,150,0.7)");
 
-      drawConnections(blueParticles, "#4DAAE9", 60);
+      drawConnections(blueParticles, "#4DAAE9", 80);
       drawParticles(blueParticles, "#4DAAE9");
 
       frameId = requestAnimationFrame(animate);
