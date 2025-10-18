@@ -18,7 +18,7 @@ export const PerformanceNetwork: React.FC = () => {
   const trimRatio = 0.9;
   const rightBufferRatio = 0.08;
   const upliftStart = -10;
-  const upliftEnd = -100;
+  const upliftEnd = -70;
 
   useEffect(() => {
     const interval = setInterval(() => {
