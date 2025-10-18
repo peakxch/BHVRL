@@ -69,9 +69,9 @@ export const HeroMobile: React.FC = () => {
       </div>
 
       {/* ---- Content ---- */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 mt-[50vh] sm:mt-56 flex flex-col">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 mt-[40vh] sm:mt-56 flex flex-col">
         <div className="flex flex-col text-left space-y-6">
-          <h1 className="font-space-grotesk font-bold text-4xl sm:text-5xl leading-tight text-black">
+          <h1 className="font-space-grotesk font-bold text-5xl sm:text-5xl leading-tight text-black">
             <div className="block">Decode</div>
             <div className="block">
               <span className="inline-block min-w-[100px] text-[#4DAAE9]">
