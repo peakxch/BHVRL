@@ -15,14 +15,6 @@ export const Hero: React.FC = () => {
 
   const [showScrollHint, setShowScrollHint] = useState(true);
 
-  useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY > 40) setShowScrollHint(false);
-      else setShowScrollHint(true);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   useEffect(() => {
     const type = () => {
@@ -105,9 +97,7 @@ export const Hero: React.FC = () => {
   onClick={() => {
     document.getElementById("process")?.scrollIntoView({ behavior: "smooth" });
   }}
-  className={`cursor-pointer fixed inset-x-0 bottom-8 z-20 flex justify-center text-sm text-gray-500 transition-opacity duration-500 ${
-    showScrollHint ? "opacity-100" : "opacity-0"
-  }`}
+  className="cursor-pointer mt-20 flex justify-center text-sm text-gray-500"
 >
   Scroll to discover more ↓
 </div>

@@ -8,32 +8,39 @@ export const Gallery: React.FC = () => {
 
   const cases = [
     {
-      title: "Retail Transformation",
-      description: "Helped a legacy retailer increase online revenue by 340% through digital strategy.",
-      category: "South Africa",
+      title: "Data Consumption Behaviour",
+      description: "Quantified and uncovered key data consumption archtypes and their behavioural triggers for increasing usage leading to a ~22% increase in ARPU on targeted populations",
+      country: "South Africa",
       industry: "Telecommunications",
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom1.png"
     },
     {
-      title: "Market Expansion",
-      description: "Guided a SaaS startup's successful entry into European markets.",
-      category: "Growth Strategy",
-      industry: "South Africa",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom2.png"
+      title: "Market Lifecycle Prediction",
+      description: "Developed a sales lifecycle prediction for different products across key markets for data driven decisions for product pricing, marketing and channel allocations throughout their lifecycle",
+      country: "Germany",
+      industry: "Consumer Audio",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Sennheiser1.png"
     },
     {
-      title: "Organizational Restructure",
-      description: "Redesigned operations for a manufacturing company, reducing costs by 25%.",
-      category: "Operations",
-      industry: "South Africa",
-      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Vodacom3.png"
+      title: "Archetype Behavioural Insights",
+      description: "Distilled the customer base transations into key behavioural archetypes and uncovered their behavioural triggers leading to an uplift of 12% in ARPU",
+      country: "Romania",
+      industry: "Credit Cards",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Credit1.png"
     },
     {
       title: "Innovation Framework",
       description: "Established R&D processes that accelerated product development by 60%.",
-      category: "Innovation",
+      country: "Innovation",
       industry: "South Africa",
       image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/SA.png"
+    },
+    {
+      title: "Channel Pricing Stabilization",
+      description: "Developed a pricing tool that used current channel sales, competitor pricing and vendor pricing to determine the best price given market conditions",
+      country: "Germany",
+      industry: "Consumer Audio",
+      image: "https://raw.githubusercontent.com/peakxch/BHVRL/refs/heads/main/Media/Sennheiser2.png"
     }
   ];
 
@@ -46,7 +53,7 @@ export const Gallery: React.FC = () => {
   };
 
   return (
-    <section id="gallery" className="py-20 lg:py-10">
+    <section id="gallery" className="py-24 ">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="text-center ">
           <h2 className="font-space-grotesk font-bold text-3xl lg:text-5xl text-black mb-6">
@@ -79,7 +86,7 @@ export const Gallery: React.FC = () => {
                         {case_study.industry}
                       </div>
                       <div className="text-sm font-medium text-gray-400 mb-3">
-                        {case_study.category}
+                        {case_study.country}
                       </div>
                       <h3 className="font-space-grotesk font-semibold text-xl lg:text-2xl text-black mb-4">
                         {case_study.title}
@@ -87,10 +94,6 @@ export const Gallery: React.FC = () => {
                       <p className="text-gray-600 leading-relaxed mb-6">
                         {case_study.description}
                       </p>
-                      <button className="flex items-center gap-2 text-black hover:text-blue-500 transition-colors duration-300 font-medium">
-                        View case study
-                        <ExternalLink size={16} />
-                      </button>
                     </div>
                   </div>
                 </div>
