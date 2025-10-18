@@ -45,14 +45,15 @@ export const ProcessMobile: React.FC = () => {
       <div
         className="relative z-10 max-w-lg mx-auto  rounded-3xl text-left"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.35) 100%)",
+        
           backdropFilter: "blur(26px) brightness(1.08)",
           WebkitBackdropFilter: "blur(26px) brightness(1.08)",
-          border: "1px solid rgba(255,255,255,0.25)",
+  
           // ✅ soft outer glow spreading outward
-          boxShadow:
-            "0 0 60px 25px rgba(255,255,255,0.35), 0 0 120px 40px rgba(255,255,255,0.25)",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+          padding: "1rem 1rem",
+          borderRadius: "1px",
+          boxShadow: "0 0 60px 20px rgba(255, 255, 255, 0.7)",
         }}
       >
         <h2 className="font-space-grotesk font-bold text-5xl text-black leading-tight">
