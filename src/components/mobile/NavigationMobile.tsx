@@ -35,7 +35,7 @@ export const Navigation: React.FC = () => {
           <div className="md:hidden py-6 border-t border-gray-100">
             <div className="flex flex-col space-y-4">
             
-              <a href="#contact" className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded transition-colors duration-300 text-center">
+              <a href="#contact-mobile" className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded transition-colors duration-300 text-center">
                 Contact
               </a>
             </div>
