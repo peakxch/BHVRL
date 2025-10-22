@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ParticleSystem } from '../desktop/ParticleSystem'; // ✅ uses original desktop particle system
 
 export const HeroMobile: React.FC = () => {
-  const words = ['Human', 'Product', 'Process', 'Usage', 'Transaction'];
+  const words = [ 'Product', 'Process', 'Usage', 'Transaction','Human'];
 
   const [currentWord, setCurrentWord] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
