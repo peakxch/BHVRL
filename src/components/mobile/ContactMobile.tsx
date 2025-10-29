@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import emailjs from '@emailjs/browser';
-import ContactParticleSystem from './ContactParticleSystem';
+import ContactParticleSystem from './ContactParticleSystemMobile';
 
 const ContactMobile: React.FC = () => {
   const form = useRef<HTMLFormElement>(null);
