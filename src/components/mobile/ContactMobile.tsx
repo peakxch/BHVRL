@@ -45,7 +45,7 @@ export const ContactMobile: React.FC = () => {
             href="mailto:info@bhvrl.com"
             className="text-[#4DAAE9] underline hover:text-[#3b94cc]"
           >
-            info@bhvrl.com
+            claudio.wyss@bhvrl.ch
           </a>
           <p className="text-white text-sm">
           Or use the form below

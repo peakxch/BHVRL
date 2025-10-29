@@ -18,7 +18,7 @@ export const Contact: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <Mail size={24} className="text-blue-400" />
-                  <span className="text-lg">hello@bhvrl.ch</span>
+                  <span className="text-lg">claudio.wyss@bhvrl.ch</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <Phone size={24} className="text-blue-400" />
