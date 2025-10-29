@@ -1,29 +1,36 @@
-// components/mobile/ContactMobile.tsx
-import React, { useState } from "react";
-import ContactParticleSystem from "./ContactParticleSystemMobile"; // ✅ import your uploaded file
+import React, { useRef } from 'react';
+import emailjs from '@emailjs/browser';
+import ContactParticleSystem from './ContactParticleSystem';
 
-export const ContactMobile: React.FC = () => {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+const ContactMobile: React.FC = () => {
+  const form = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", form);
-    // Add backend or email service here
-    setForm({ name: "", email: "", message: "" });
+
+    if (form.current) {
+      emailjs
+        .sendForm(
+          'service_x2e65sh', // Replace with your EmailJS service ID
+          'template_wcwumzp', // Replace with your EmailJS template ID
+          form.current,
+          'NRaXnDJrWfa_Sc0To'  // Replace with your EmailJS public key
+        )
+        .then(
+          (result) => {
+            console.log('Email sent successfully:', result.text);
+            alert('Your message has been sent!');
+          },
+          (error) => {
+            console.error('Error sending email:', error.text);
+            alert('Failed to send your message. Please try again.');
+          }
+        );
+    }
   };
 
   return (
-    <section
-      id="contact-mobile"
-      className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black text-white overflow-hidden px-6 py-20"
-    >
+    <div className="relative w-full h-full">
       {/* Particle background */}
       <div className="absolute inset-0 z-0">
         <ContactParticleSystem>
@@ -37,7 +44,7 @@ export const ContactMobile: React.FC = () => {
           Let’s Connect
         </h2>
         <p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-2">
-            BHVRL offer free impact assessments to gauge how our solutions can drive value for your business
+          BHVRL offers free impact assessments to gauge how our solutions can drive value for your business.
         </p>
         <p className="text-white text-sm">
           Email us at{" "}
@@ -47,66 +54,61 @@ export const ContactMobile: React.FC = () => {
           >
             claudio.wyss@bhvrl.ch
           </a>
-          <p className="text-white text-sm">
-          Or use the form below
-          </p>
+        </p>
+        <p className="text-white text-sm">Or use the form below</p>
+
         {/* Contact form */}
         <form
+          ref={form}
           onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-5 bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg"
+          className="space-y-4 w-full px-4"
         >
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Name"
-            required
-            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-          />
-
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-          />
-
+          <div>
+            <label htmlFor="name" className="block text-sm mb-1 text-white">
+              Name
+            </label>
             <input
-            type="Company"
-            name="Company"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Company Name"
-            required
-            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-          />
-
-          <textarea
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            placeholder="Your Message"
-            rows={4}
-            required
-            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-          />
-
+              type="text"
+              id="name"
+              name="user_name"
+              required
+              className="w-full px-3 py-2 rounded bg-gray-800 text-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm mb-1 text-white">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="user_email"
+              required
+              className="w-full px-3 py-2 rounded bg-gray-800 text-white"
+            />
+          </div>
+          <div>
+            <label htmlFor="message" className="block text-sm mb-1 text-white">
+              Message
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows={4}
+              required
+              className="w-full px-3 py-2 rounded bg-gray-800 text-white"
+            ></textarea>
+          </div>
           <button
             type="submit"
-            className="bg-[#4DAAE9] text-white font-semibold py-3 rounded-full hover:bg-[#3b94cc] transition-all duration-300"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300 w-full"
           >
-            Send Message
+            Submit
           </button>
         </form>
-
-        {/* Footer */}
-
-        </p>
       </div>
-    </section>
+    </div>
   );
 };
+
+export default ContactMobile;
