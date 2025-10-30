@@ -1,113 +1,131 @@
 // components/mobile/ContactMobile.tsx
-import React, { useState } from "react";
-import ContactParticleSystem from "./ContactParticleSystemMobile"; // ✅ import your uploaded file
+import React, { useState, useRef } from "react";
+import emailjs from "@emailjs/browser";
+import ContactParticleSystem from "./ContactParticleSystemMobile";
 
 export const ContactMobile: React.FC = () => {
-const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const formRef = useRef<HTMLFormElement>(null);
+  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [isSending, setIsSending] = useState(false);
 
-const handleChange = (
-e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-) => {
-const { name, value } = e.target;
-setForm((prev) => ({ ...prev, [name]: value }));
-};
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-const handleSubmit = (e: React.FormEvent) => {
-e.preventDefault();
-console.log("Form submitted:", form);
-// Add backend or email service here
-setForm({ name: "", email: "", message: "" });
-};
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-return (
-<section
-id="contact-mobile"
-className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black text-white overflow-hidden px-6 py-20"
->
-{/* Particle background */}
-<div className="absolute inset-0 z-0">
-<ContactParticleSystem>
-{/* we don’t pass children here, background only */}
-</ContactParticleSystem>
-</div>
+    if (!formRef.current) return;
 
-{/* Main content */}
-<div className="relative z-10 w-full max-w-sm flex flex-col items-center justify-center text-center">
-<h2 className="font-space-grotesk font-bold text-4xl mb-3 mt-3">
-Let’s Connect
-</h2>
-<p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-2">
-BHVRL offer free impact assessments to gauge how our solutions can drive value for your business
-</p>
-<p className="text-white text-sm">
-Email us at{" "}
-<a
-href="mailto:info@bhvrl.com"
-className="text-[#4DAAE9] underline hover:text-[#3b94cc]"
->
-            info@bhvrl.com
+    setIsSending(true);
+
+    emailjs
+      .sendForm(
+        "service_x2e65sh", // Your EmailJS service ID
+        "template_wcwumzp", // Your EmailJS template ID
+        formRef.current,
+        "NRaXnDJrWfa_Sc0To" // Your EmailJS public key
+      )
+      .then(
+        (result) => {
+          console.log("Email sent successfully:", result.text);
+          alert("Your message has been sent!");
+          setForm({ name: "", email: "", company: "", message: "" });
+        },
+        (error) => {
+          console.error("Error sending email:", error.text);
+          alert("Failed to send your message. Please try again.");
+        }
+      )
+      .finally(() => setIsSending(false));
+  };
+
+  return (
+    <section
+      id="contact-mobile"
+      className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black text-white overflow-hidden px-6 py-20"
+    >
+      <div className="absolute inset-0 z-0">
+        <ContactParticleSystem />
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm flex flex-col items-center justify-center text-center">
+        <h2 className="font-space-grotesk font-bold text-4xl mb-3 mt-3">
+          Let’s Connect
+        </h2>
+        <p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-2">
+          BHVRL offers free impact assessments to gauge how our solutions can drive value for your business.
+        </p>
+        <p className="text-white text-sm mb-4">
+          Email us at{" "}
+          <a
+            href="mailto:claudio.wyss@bhvrl.ch"
+            className="text-[#4DAAE9] underline hover:text-[#3b94cc]"
+          >
             claudio.wyss@bhvrl.ch
-</a>
-<p className="text-white text-sm">
-Or use the form below
-</p>
-{/* Contact form */}
-<form
-onSubmit={handleSubmit}
-className="w-full flex flex-col gap-5 bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg"
->
-<input
-type="text"
-name="name"
-value={form.name}
-onChange={handleChange}
-placeholder="Name"
-required
-className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-/>
+          </a>{" "}
+          or use the form below:
+        </p>
 
-<input
-type="email"
-name="email"
-value={form.email}
-onChange={handleChange}
-placeholder="Email"
-required
-className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-/>
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="w-full flex flex-col gap-5 bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg"
+        >
+          <input
+            type="text"
+            name="user_name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Name"
+            required
+            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
+          />
 
-<input
-type="Company"
-name="Company"
-value={form.email}
-onChange={handleChange}
-placeholder="Company Name"
-required
-className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-/>
+          <input
+            type="email"
+            name="user_email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            required
+            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
+          />
 
-<textarea
-name="message"
-value={form.message}
-onChange={handleChange}
-placeholder="Your Message"
-rows={4}
-required
-className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
-/>
+          <input
+            type="text"
+            name="company"
+            value={form.company}
+            onChange={handleChange}
+            placeholder="Company Name"
+            required
+            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
+          />
 
-<button
-type="submit"
-className="bg-[#4DAAE9] text-white font-semibold py-3 rounded-full hover:bg-[#3b94cc] transition-all duration-300"
->
-Send Message
-</button>
-</form>
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            placeholder="Your Message"
+            rows={4}
+            required
+            className="w-full bg-transparent border-b border-gray-500 text-white px-2 py-3 placeholder-gray-400 focus:outline-none focus:border-[#4DAAE9]"
+          />
 
-{/* Footer */}
-
-</p>
-</div>
-</section>
-);
+          <button
+            type="submit"
+            disabled={isSending}
+            className={`${
+              isSending ? "bg-gray-500" : "bg-[#4DAAE9] hover:bg-[#3b94cc]"
+            } text-white font-semibold py-3 rounded-full transition-all duration-300`}
+          >
+            {isSending ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
 };
