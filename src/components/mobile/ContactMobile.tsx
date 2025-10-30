@@ -1,11 +1,15 @@
-// components/mobile/ContactMobile.tsx
 import React, { useState, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import ContactParticleSystem from "./ContactParticleSystemMobile";
 
 export const ContactMobile: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null);
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({
+    user_name: "",
+    user_email: "",
+    company: "",
+    message: "",
+  });
   const [isSending, setIsSending] = useState(false);
 
   const handleChange = (
@@ -17,23 +21,20 @@ export const ContactMobile: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formRef.current) return;
-
     setIsSending(true);
 
     emailjs
       .sendForm(
-        "service_x2e65sh", // Your EmailJS service ID
-        "template_wcwumzp", // Your EmailJS template ID
+        "service_x2e65sh",
+        "template_wcwumzp",
         formRef.current,
-        "NRaXnDJrWfa_Sc0To" // Your EmailJS public key
+        "NRaXnDJrWfa_Sc0To"
       )
       .then(
-        (result) => {
-          console.log("Email sent successfully:", result.text);
+        () => {
           alert("Your message has been sent!");
-          setForm({ name: "", email: "", company: "", message: "" });
+          setForm({ user_name: "", user_email: "", company: "", message: "" });
         },
         (error) => {
           console.error("Error sending email:", error.text);
@@ -46,19 +47,24 @@ export const ContactMobile: React.FC = () => {
   return (
     <section
       id="contact-mobile"
-      className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black text-white overflow-hidden px-6 py-20"
+      className="relative flex flex-col items-center justify-center min-h-[90vh] bg-black text-white px-6 py-20"
     >
-      <div className="absolute inset-0 z-0">
+      {/* Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <ContactParticleSystem />
       </div>
 
+      {/* Foreground */}
       <div className="relative z-10 w-full max-w-sm flex flex-col items-center justify-center text-center">
         <h2 className="font-space-grotesk font-bold text-4xl mb-3 mt-3">
           Let’s Connect
         </h2>
-        <p className="text-gray-300 text-base max-w-sm mx-auto leading-relaxed mb-2">
-          BHVRL offers free impact assessments to gauge how our solutions can drive value for your business.
+
+        <p className="text-gray-300 text-base leading-relaxed mb-3">
+          BHVRL offers free impact assessments to gauge how our solutions can
+          drive value for your business.
         </p>
+
         <p className="text-white text-sm mb-4">
           Email us at{" "}
           <a
@@ -73,12 +79,12 @@ export const ContactMobile: React.FC = () => {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="w-full flex flex-col gap-5 bg-black/60 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-lg"
+          className="w-full flex flex-col gap-5 bg-black/80 border border-white/10 p-6 rounded-2xl shadow-lg relative z-20"
         >
           <input
             type="text"
             name="user_name"
-            value={form.name}
+            value={form.user_name}
             onChange={handleChange}
             placeholder="Name"
             required
@@ -88,7 +94,7 @@ export const ContactMobile: React.FC = () => {
           <input
             type="email"
             name="user_email"
-            value={form.email}
+            value={form.user_email}
             onChange={handleChange}
             placeholder="Email"
             required
